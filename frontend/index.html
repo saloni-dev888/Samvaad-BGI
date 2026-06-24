@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SAMVAAD@BGI - Student Well-being App</title>
+  
+  
+
+  <style>
+    /* === Base Styling === */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: #3a1752;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    /* === Pastel Blurred Background === */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("https://tse3.mm.bing.net/th/id/OIP._mx1eeCS_rQGND38sUFduAHaDR?pid=Api&P=0&h=180") no-repeat center center fixed;
+      background-size: cover;
+      filter: blur(8px) brightness(1.3);
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 240, 250, 0.35);
+      z-index: -1;
+    }
+
+    /* === Navbar === */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(6px);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    nav h1 {
+      font-size: 26px;
+      font-weight: bold;
+      color: #5e0b91;
+      text-shadow: 0 0 5px rgba(173, 127, 255, 0.5);
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #005c54;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #8b4ad3;
+    }
+
+    /* === Buttons === */
+    .btnt {
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 2px solid rgba(106, 27, 154, 0.6);
+      cursor: pointer;
+      margin-right: 10px;
+      font-family: 'Times New Roman', Times, serif;
+      background: linear-gradient(135deg, #f7d8f9, #b7f8c3, #a7d3f5);
+      color: #3e1367;
+      font-weight: bold;
+      box-shadow: 0 0 12px rgba(180, 180, 255, 0.6);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .btnt:hover {
+      transform: scale(1.08);
+      background: linear-gradient(135deg, #f0b9ff, #aaf5d2, #a7d3f5);
+      box-shadow: 0 0 20px rgba(255, 200, 240, 0.8);
+    }
+
+    /* === Fancy Buttons (Hero) === */
+    .btn {
+      padding: 12px 26px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+      transition: all 0.3s ease-in-out;
+      font-family: 'Times New Roman', Times, serif;
+      background: linear-gradient(135deg, #ffd6f9, #b6f9d6, #c5d4f9);
+      color: #4b0082;
+      box-shadow: 0 0 15px rgba(255,255,255,0.5);
+    }
+
+    .btn:hover {
+      transform: scale(1.1);
+      background: linear-gradient(135deg, #f3b9ff, #b7f8c3, #a7d3f5);
+      box-shadow: 0 0 25px rgba(240, 128, 128, 0.8);
+    }
+
+    /* === Toggle Switch === */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(90deg, #b67be8, #57dcad);
+      box-shadow: 0 0 10px rgba(183, 122, 255, 0.8);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* === Hero Section === */
+    .hero {
+      text-align: center;
+      padding: 130px 20px 80px;
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      color: #420a73;
+    }
+
+    .hero h2 {
+      font-size: 48px;
+      font-weight: bold;
+      color: #6a1b9a;
+      text-shadow: 0 0 6px rgba(200, 150, 255, 0.5);
+      animation: fadeDown 1s;
+    }
+
+    .hero p {
+      font-size: 18px;
+      margin-bottom: 30px;
+      animation: fadeUp 1.2s;
+      font-weight: bold;
+      color: rgb(110, 13, 228);
+      text-shadow: 0 0 5px rgba(200, 200, 255, 0.4);
+    }
+
+    /* === Features === */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      padding: 30px;
+      font-family: Georgia, 'Times New Roman', Times, serif;
+      color: #3a1752;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.75);
+      padding: 20px;
+      border-radius: 20px;
+      border: 2px solid rgba(255, 182, 193, 0.4);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card h3 {
+      color: #6a1b9a;
+      margin-bottom: 10px;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 18px rgba(255, 182, 193, 0.5);
+    }
+
+    /* === Footer === */
+    footer {
+      text-align: center;
+      background: rgba(255,255,255,0.7);
+      padding: 20px;
+      backdrop-filter: blur(5px);
+      border-top: 2px solid #e2d4f7;
+      margin-top: 20px;
+      color: #4b0082;
+    }
+
+    /* === Animations === */
+    @keyframes fadeDown {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    @keyframes fadeUp {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    /* === DARK MODE === */
+    body.dark {
+      background: #1b1428;
+      color: #e8dfff;
+    }
+
+    body.dark::before {
+      filter: blur(10px) brightness(0.4);
+    }
+
+    body.dark nav {
+      background: rgba(30, 20, 60, 0.8);
+      color: #eee;
+    }
+
+    body.dark nav h1 {
+      color: #d9c4ff;
+      text-shadow: 0 0 8px rgba(200,150,255,0.7);
+    }
+
+    body.dark .btnt, body.dark .btn {
+      background: linear-gradient(135deg, #3b1c68, #254d47, #2c406b);
+      color: #e8dfff;
+      box-shadow: 0 0 10px rgba(180, 130, 255, 0.5);
+      border-color: rgba(170,130,255,0.3);
+    }
+
+    body.dark .btnt:hover, body.dark .btn:hover {
+      transform: scale(1.08);
+      background: linear-gradient(135deg, #5f3e91, #367565, #466cb5);
+      box-shadow: 0 0 20px rgba(180,130,255,0.7);
+    }
+
+    body.dark .card {
+      background: rgba(40, 30, 70, 0.85);
+      border: 2px solid rgba(170, 130, 255, 0.3);
+      color: #e8dfff;
+      box-shadow: 0 0 12px rgba(160, 110, 255, 0.2);
+    }
+
+    body.dark footer {
+      background: rgba(30, 20, 50, 0.85);
+      color: #c8aaff;
+      border-top: 2px solid rgba(170, 130, 255, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav>
+    <h1>SAMVAAD@BGI</h1>
+    <div>
+      <button class="btnt"><a href="login.html" style="text-decoration:none; color:inherit;">Login</a></button>
+      <button class="btnt"><a href="registration.html" style="text-decoration:none; color:inherit;">Register</a></button>
+      <button class="btnt"><a href="aboutUs.html" style="text-decoration:none; color:inherit;">About Us</a></button>
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle" onclick="toggleDark()">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Whispers of Change, Echoes of Care</h2>
+    <p>Because every silent voice deserves to be heard 💌</p>
+    <button class="btn"><a href="about_college.html" style="text-decoration:none; color:inherit;">Know about your college</a></button>
+    <button class="btn"><a href="login.html" style="text-decoration:none; color:inherit;">Login</a></button>
+  </section>
+
+  <!-- Features -->
+  <section class="features">
+    <div class="card">
+      <a href="anonymousMessage.html" style="text-decoration:none; color:inherit;">
+        <h3>Anonymous Messaging</h3>
+      </a>
+      <p>Send messages or complaints anonymously to improve campus life.</p>
+    </div>
+    <div class="card">
+      <a href="management.html" style="text-decoration:none; color:inherit;">
+        <h3>Management</h3>
+      </a>
+      <p>View dashboards, stats & take action on insights.</p>
+    </div>
+    <div class="card">
+      <a href="wec.html" style="text-decoration:none; color:inherit;">
+        <h3>Women Empowerment Cell (WEC)</h3>
+      </a>
+      <p>Receive confidential gender-related concerns & urgent alerts.</p>
+    </div>
+    <div class="card">
+      <a href="admin.html" style="text-decoration:none; color:inherit;">
+        <h3>Admin</h3>
+      </a>
+      <p>Manage users, roles & ensure system security — without accessing private messages.</p>
+    </div>
+    <div class="card">
+      <a href="event.html" style="text-decoration:none; color:inherit;">
+        <h3>Event and Activity</h3>
+      </a>
+      <p>Get updates about campus events & activities.</p>
+    </div>
+    <div class="card">
+      <a href="feedback.html" style="text-decoration:none; color:inherit;">
+        <h3>Feedback and Suggestion</h3>
+      </a>
+      <p>Send feedback & propose ideas for a better campus.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 SAMVAAD@BGI | Communication Beyond Boundaries</p>
+  </footer>
+<script src="js/common.js"></script>
+<script>
+// Keep toggle position in sync with theme
+window.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("darkModeToggle");
+  if (toggle) {
+    toggle.checked = sessionStorage.getItem("theme") === "dark";
+  }
+});
+</script>
+</body>
+</html>

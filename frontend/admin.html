@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Samvaad Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* --- General --- */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #121212;
+  color: #f0f0f0;
+  transition: all 0.3s ease;
+}
+header {
+  background: linear-gradient(90deg, #1a365d, #4c51bf);
+  color: white;
+  padding: 25px 20px;
+  text-align: center;
+  font-size: 26px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  position: relative;
+}
+#darkToggle {
+  position: absolute; right: 20px; top: 25px;
+  padding: 6px 12px; border: none; border-radius: 12px;
+  cursor: pointer; background: #f5f5f5; color: #121212; font-weight: bold;
+}
+.container { display: flex; min-height: calc(100vh - 90px); }
+nav {
+  background: #1f1f1f; color: white; width: 230px; padding: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  border-radius: 0 20px 20px 0;
+}
+nav a {
+  display: block; color: white; text-decoration: none;
+  margin: 15px 0; font-weight: bold; padding: 10px 12px;
+  border-radius: 12px; transition: 0.3s;
+  background: rgba(255,255,255,0.05);
+}
+nav a:hover { background: linear-gradient(90deg, #4c51bf, #1a365d); }
+main { flex: 1; padding: 25px; display: grid; gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 20px; padding: 20px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.7); }
+.card h2 { margin-top: 0; font-size: 22px; color: #f5f5f5; margin-bottom: 15px; }
+.loading { text-align:center; padding:20px; color:#aaa; }
+
+/* --- Alerts / Feed / Tabs --- */
+.activity-feed { max-height: 250px; overflow-y: auto; padding-right: 10px; }
+.activity-item {
+  background: rgba(255,255,255,0.1); border-left: 5px solid #4c51bf;
+  border-radius: 10px; padding: 10px; margin-bottom: 10px;
+  font-size: 15px; box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  animation: fadeIn 0.5s ease-in;
+}
+.alert { background: rgba(255,255,255,0.1); border-left: 5px solid #e53e3e;
+  border-radius: 10px; padding: 10px; margin-bottom: 10px;
+  color: #f0f0f0; font-weight: 500;
+  animation: pulse 1.5s infinite alternate;
+}
+.tab { display: flex; margin-bottom: 10px; }
+.tab button { flex:1; margin-right:5px; background: rgba(255,255,255,0.05); color:#f0f0f0; }
+.tab button.active { background:#4c51bf; color:white; }
+.tabcontent { display:none; }
+.tabcontent.active { display:block; }
+
+/* --- AI Insights --- */
+#ai-insights { background: linear-gradient(145deg, #1f1f2e, #2d2d44);
+  padding:20px; border-radius:15px; color:white;
+}
+#ai-insights h2 { text-align:center; margin-bottom:20px; }
+.insights-grid { display:flex; flex-wrap:wrap; gap:30px; justify-content:center; }
+</style>
+</head>
+<body>
+
+<header>
+  Samvaad Admin Dashboard
+  <button id="darkToggle">🌙</button>
+</header>
+
+<div class="container">
+  <nav>
+    <a href="#">User Management</a>
+    <a href="#">Feedback Moderation</a>
+    <a href="#">System Alerts</a>
+    <a href="#">AI Insights</a>
+  </nav>
+
+  <main>
+    <!-- 🕓 Live Activity Feed -->
+    <div class="card">
+      <h2>🕓 Real-Time Activity Feed</h2>
+      <div id="activityFeed" class="activity-feed">
+        <div class="loading">Fetching live updates...</div>
+      </div>
+    </div>
+
+    <!-- ⚠️ Moderation Queue -->
+    <div class="card">
+      <h2>⚠️ Moderation Queue</h2>
+      <div class="tab">
+        <button class="tablinks active" onclick="openTab(event, 'Pending')">Pending</button>
+        <button class="tablinks" onclick="openTab(event, 'Flagged')">Flagged</button>
+        <button class="tablinks" onclick="openTab(event, 'Approved')">Approved</button>
+      </div>
+      <div id="Pending" class="tabcontent active"><div class="loading">Loading pending messages...</div></div>
+      <div id="Flagged" class="tabcontent"><div class="loading">Loading flagged messages...</div></div>
+      <div id="Approved" class="tabcontent"><div class="loading">Loading approved messages...</div></div>
+    </div>
+
+    <!-- 📊 Charts -->
+    <div class="card"><h2>📊 Feedback Sentiment</h2><canvas id="sentimentChart"></canvas></div>
+    <div class="card"><h2>📈 Feedback Categories</h2><canvas id="categoryChart"></canvas></div>
+
+    <!-- 🤖 AI Insights -->
+    <div id="ai-insights" class="card">
+      <h2>🤖 AI Feedback Insights</h2>
+      <p id="ai-summary">Click “Generate Summary” to analyze feedback trends.</p>
+      <button id="generateSummaryBtn">Generate Summary</button>
+      <canvas id="aiSentimentChart"></canvas>
+    </div>
+  </main>
+</div>
+
+<script>
+// === Dark Mode ===
+const toggle = document.getElementById("darkToggle");
+if(sessionStorage.getItem("theme")==="light") enableLight();
+toggle.addEventListener("click",()=>{
+  if(document.body.classList.contains("light")){
+    sessionStorage.setItem("theme","dark"); disableLight();
+  } else { sessionStorage.setItem("theme","light"); enableLight(); }
+});
+function enableLight(){
+  document.body.classList.add("light");
+  document.body.style.background="#f1f8e9"; document.body.style.color="#222";
+}
+function disableLight(){
+  document.body.classList.remove("light");
+  document.body.style.background="#121212"; document.body.style.color="#f0f0f0";
+}
+
+// === Tabs ===
+function openTab(evt, name){
+  document.querySelectorAll(".tabcontent").forEach(c=>c.classList.remove("active"));
+  document.getElementById(name).classList.add("active");
+  document.querySelectorAll(".tablinks").forEach(b=>b.classList.remove("active"));
+  evt.currentTarget.classList.add("active");
+}
+
+// === Live Activity Feed ===
+async function loadActivity(){
+  const feed=document.getElementById("activityFeed");
+  feed.innerHTML="<div class='loading'>Loading...</div>";
+  try{
+    const res=await fetch("/api/admin/activity");
+    const data=await res.json();
+    feed.innerHTML="";
+    data.slice(-8).reverse().forEach(item=>{
+      const div=document.createElement("div");
+      div.className="activity-item";
+      div.textContent=`${item.time} • ${item.text}`;
+      feed.prepend(div);
+    });
+  }catch(err){feed.innerHTML="<div class='loading'>⚠️ Failed to load feed</div>";}
+}
+setInterval(loadActivity,10000); // auto-refresh every 10s
+loadActivity();
+
+// === Moderation Queue ===
+async function loadMessages(){
+  const [pendingRes, flaggedRes, approvedRes] = await Promise.all([
+    fetch("/api/admin/messages?status=pending"),
+    fetch("/api/admin/messages?status=rejected"),
+    fetch("/api/admin/messages?status=sent")
+  ]);
+  const pending=await pendingRes.json(), flagged=await flaggedRes.json(), approved=await approvedRes.json();
+
+  renderTable("Pending",pending);
+  renderTable("Flagged",flagged);
+  renderTable("Approved",approved);
+}
+function renderTable(id,data){
+  const container=document.getElementById(id);
+  if(!data.length){container.innerHTML="<div class='loading'>No messages.</div>";return;}
+  const table=document.createElement("table");
+  table.innerHTML="<tr><th>Sender</th><th>Recipient</th><th>Message</th><th>Status</th><th>Action</th></tr>";
+  data.forEach(msg=>{
+    const row=document.createElement("tr");
+    row.innerHTML=`
+      <td>${msg.senderEmail}</td>
+      <td>${msg.recipientEmail}</td>
+      <td>${msg.content.substring(0,50)}...</td>
+      <td>${msg.status}</td>
+      <td>
+        ${msg.status==="pending"?`
+        <button onclick="moderate('${msg._id}','approve')">✅ Approve</button>
+        <button onclick="moderate('${msg._id}','reject')">🚫 Reject</button>`:"-"}
+      </td>`;
+    table.appendChild(row);
+  });
+  container.innerHTML=""; container.appendChild(table);
+}
+async function moderate(id,action){
+  await fetch(`/api/messages/${action}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messageId:id,reason:"Flagged by admin"})});
+  loadMessages();
+}
+loadMessages();
+setInterval(loadMessages,15000);
+
+// === Charts ===
+const sentimentCtx=document.getElementById('sentimentChart').getContext('2d');
+new Chart(sentimentCtx,{type:'doughnut',data:{
+  labels:['Positive','Neutral','Negative'],
+  datasets:[{data:[50,30,20],backgroundColor:['#38a169','#ecc94b','#e53e3e']}]
+},options:{plugins:{legend:{position:'bottom'}}}});
+
+const categoryCtx=document.getElementById('categoryChart').getContext('2d');
+new Chart(categoryCtx,{type:'bar',data:{
+  labels:['Academics','Events','Facilities','Others'],
+  datasets:[{label:'Feedback Count',data:[25,20,30,15],backgroundColor:'#4c51bf'}]
+},options:{scales:{y:{beginAtZero:true}}}});
+
+// === AI Insights ===
+document.getElementById("generateSummaryBtn").addEventListener("click",async()=>{
+  const summary=document.getElementById("ai-summary");
+  summary.textContent="Analyzing feedback...";
+  try{
+    const res=await fetch("/api/admin/ai-summary");
+    const data=await res.json();
+    summary.textContent=data.summary;
+    const aiCtx=document.getElementById('aiSentimentChart').getContext('2d');
+    new Chart(aiCtx,{type:'pie',data:{labels:['Positive','Neutral','Negative'],
+      datasets:[{data:[data.sentiments.positive,data.sentiments.neutral,data.sentiments.negative],
+      backgroundColor:['#4caf50','#ffeb3b','#f44336']}]},
+      options:{plugins:{legend:{position:'bottom'}}}});
+  }catch(err){
+    summary.textContent="❌ Error fetching AI summary.";
+  }
+});
+</script>
+</body>
+</html>

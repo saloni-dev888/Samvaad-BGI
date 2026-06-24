@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAMVAAD - Event Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="js/common.js" defer></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',sans-serif;}
+  body{background:#f0f4f8;color:#333; transition: background 0.3s ease, color 0.3s ease;}
+  body.dark{background: #1e1e2f;
+  color: #ddd;
+}
+body.dark header{
+  background: linear-gradient(120deg, #222, #444);
+}
+  .logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 120px; /* so it doesn’t overlap Dark Mode */
+  cursor: pointer;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: #e60000;
+}
+
+body.dark .logout-btn {
+  background: #ff6666;
+  color: #222;
+}
+body.dark .logout-btn:hover {
+  background: #ff3333;
+}
+
+  header{background:linear-gradient(120deg,#6a11cb,#2575fc);color:white;text-align:center;padding:2rem;font-size:2rem;font-weight:700;position:relative;}
+  header .dark-toggle{position:absolute;top:20px;right:20px;cursor:pointer;background:white;color:#2575fc;border:none;padding:5px 10px;border-radius:8px;}
+  header .role-info{position:absolute;top:20px;left:20px;font-size:1rem;color:white;}
+
+  .container{display:grid;grid-template-columns:1fr 1fr;gap:30px;padding:30px;}
+  @media(max-width:900px){.container{grid-template-columns:1fr;}}
+
+  .card{background:white;border-radius:20px;padding:25px;box-shadow:0 10px 20px rgba(0,0,0,0.1);transition:transform 0.2s,box-shadow 0.2s;}
+  .card:hover{transform: translateY(-5px); box-shadow:0 15px 30px rgba(0,0,0,0.15);}
+  body.dark .card{background:#2b2b44; box-shadow:0 10px 20px rgba(0,0,0,0.5);}
+  h2{font-size:1.6rem;color:#2575fc;margin-bottom:15px;}
+  body.dark h2{color:#80b3ff;}
+
+  textarea,input{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;margin-bottom:10px;font-size:1rem;}
+  button{margin-top:5px;background:#2575fc;color:white;border:none;padding:10px 15px;border-radius:10px;cursor:pointer;transition:0.3s;}
+  button:hover{background:#1a5fd0;}
+  body.dark button{background:#80b3ff;color:#222;} 
+  body.dark button:hover{background:#5590e0;}
+
+  .event-list{margin-top:10px;padding:10px;background:#f9f9f9;border-radius:12px;max-height:200px;overflow-y:auto;font-size:0.95rem;}
+  body.dark .event-list{background:#2b2b44;}
+  .event{padding:8px 10px;margin-bottom:7px;border-radius:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:0.3s;}
+  .event .like{cursor:pointer;margin-left:10px;}
+  .event:hover{background:#e3f2fd;}
+  body.dark .event:hover{background:#3b3b60;}
+
+  .filter{margin-bottom:10px;}
+  .filter button{margin-right:5px;margin-bottom:5px;font-size:0.85rem;background:#f1f1f1;color:#333;}
+  .filter button.active{background:#2575fc;color:white;}
+  body.dark .filter button{background:#444;color:#ccc;}
+  body.dark .filter button.active{background:#80b3ff;color:#222;}
+
+  .calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .month{font-size:1.3rem;font-weight:500;color:#2575fc;}
+  body.dark .month{color:#80b3ff;}
+  .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;}
+  .day{padding:15px;background:#f1f3f8;border-radius:10px;cursor:pointer;transition:0.3s;}
+  .day:hover{background:#dce5fc;}
+  .highlight{font-weight:600;}
+  body.dark .day{background:#2b2b44;}
+  body.dark .day:hover{background:#3b3b60;}
+
+  .event-color-Tech{background:#a0c4ff;}
+  .event-color-Fun{background:#ffadad;}
+  .event-color-Workshop{background:#caffbf;}
+
+  .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;}
+  .modal-content{background:white;padding:25px;border-radius:15px;max-width:400px;width:90%;text-align:left;position:relative;}
+  body.dark .modal-content{background:#2b2b44;color:#ddd;}
+  .close{position:absolute;top:10px;right:15px;font-size:1.5rem;cursor:pointer;} 
+
+  .calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 days */
+  gap: 4px;
+  text-align: center;
+}
+
+.day-header {
+  font-weight: bold;
+  padding: 10px 0;
+  background: #e3e3e3;
+  border-radius: 8px;
+}
+
+body.dark .day-header {
+  background: #333;
+  color: #ddd;
+}
+
+.day-name {
+  font-weight: bold;
+  text-align: center;
+  color: #2575fc;
+}
+body.dark .day-name {
+  color: #80b3ff;
+}
+
+.day.today {
+  background: #ffefc2;  /* soft highlight */
+  border: 2px solid #f4b400;
+  font-weight: bold;
+}
+body.dark .day.today {
+  background: #444444;
+  border: 2px solid #ffd966;
+}
+
+.accordion {
+  margin-top: 10px;
+}
+
+.accordion-btn {
+  width: 100%;
+  text-align: left;
+  background: #2575fc;
+  color: white;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  transition: 0.3s;
+}
+
+.accordion-btn:hover {
+  background: #1a5fd0;
+}
+
+body.dark .accordion-btn {
+  background: #80b3ff;
+  color: #222;
+}
+
+
+</style>
+</head>
+<body>
+
+<header>
+  SAMVAAD Dashboard
+  <span class="role-info" id="roleInfo"></span>
+  <button class="dark-toggle" onclick="toggleDark()">Dark Mode</button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+
+<div class="container">
+  <!-- Idea Submission -->
+  <div class="card">
+  <h2>💡 Submit Event Idea</h2>
+  <textarea id="ideaInput" placeholder="Share your innovative idea..."></textarea>
+  <input type="text" id="ideaTime" placeholder="Optional: Event time (e.g., 10:00 AM)">
+  <div class="filter">
+    <button onclick="setCategory('Tech')">Tech</button>
+    <button onclick="setCategory('Fun')">Fun</button>
+    <button onclick="setCategory('Workshop')">Workshop</button>
+  </div>
+  <button onclick="submitIdea()">Submit Idea</button>
+
+  <!-- List of submitted ideas -->
+  <h2 style="margin-top:20px;">📋 List of Ideas Submitted</h2>
+
+  <div class="accordion">
+  <button id="techBtn" class="accordion-btn" onclick="toggleAccordion('techIdeas')">Tech Ideas (0) ⬇</button>
+  <div id="techIdeas" class="event-list" style="display:none;"></div>
+</div>
+
+<div class="accordion">
+  <button id="funBtn" class="accordion-btn" onclick="toggleAccordion('funIdeas')">Fun Ideas (0) ⬇</button>
+  <div id="funIdeas" class="event-list" style="display:none;"></div>
+</div>
+
+<div class="accordion">
+  <button id="workshopBtn" class="accordion-btn" onclick="toggleAccordion('workshopIdeas')">Workshop Ideas (0) ⬇</button>
+  <div id="workshopIdeas" class="event-list" style="display:none;"></div>
+</div>
+
+</div>
+
+
+  <!-- Calendar -->
+  <div class="card" id="calendarCard">
+    <h2>📅 Calendar</h2>
+    <div class="calendar-header">
+      <button onclick="prevMonth()">⬅</button>
+      <div id="monthName" class="month"></div>
+      <button onclick="nextMonth()">➡</button>
+      <button onclick="goToToday()">Jump back to Today</button>
+    </div>
+    <div class="calendar" id="calendar"></div>
+    <div id="eventDetails" class="event-list"></div>
+    
+
+    <!-- Academic Calendar PDF -->
+    <h3 style="margin-top:20px;">📄 Academic Calendar</h3>
+    <a href="http://localhost:5000/api/calendar/download-pdf" target="_blank">
+      <button>Download Academic Calendar</button>
+    </a>
+    <div id="adminUpload" style="margin-top:10px; display:none;">
+      <input type="file" id="calendarFile" accept="application/pdf">
+      <button onclick="uploadCalendar()">Upload New Calendar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<div class="modal" id="eventModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3 id="modalTitle"></h3>
+    <p id="modalInfo"></p>
+  </div>
+</div>
+
+<script>
+  // ==================== TOKEN & LOGIN CHECK ====================
+  const username = sessionStorage.getItem("username") || "Guest";
+  const currentRole = sessionStorage.getItem("role") || null;
+  const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  if (!token || !currentRole) {
+    const currentPage = window.location.pathname.split("/").pop();
+    sessionStorage.setItem("redirectAfterLogin", currentPage);
+    alert("Please log in first.");
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("roleInfo").innerText =
+    `${username} (${currentRole.toUpperCase()})`;
+
+  // ==================== DARK MODE ====================
+  function toggleDark() {
+    document.body.classList.toggle("dark");
+    sessionStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  }
+  if (sessionStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+
+  // ==================== LOGOUT ====================
+  function logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    alert("You have been logged out.");
+    window.location.href = "login.html";
+  }
+
+  // ==================== IDEA HANDLING ====================
+  let selectedCategory = "Tech";
+  let ideas = [];
+
+  function setCategory(cat) {
+    selectedCategory = cat;
+    document.querySelectorAll('.filter button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  async function submitIdea() {
+    const ideaText = document.getElementById("ideaInput").value.trim();
+    const ideaTime = document.getElementById("ideaTime").value.trim();
+    if (!ideaText) return alert("Enter an idea!");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/ideas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          text: ideaText,
+          category: selectedCategory,
+          time: ideaTime
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Idea submitted!");
+        loadIdeas();
+        document.getElementById("ideaInput").value = "";
+        document.getElementById("ideaTime").value = "";
+      } else {
+        alert("Error: " + data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong.");
+    }
+  }
+
+  async function loadIdeas() {
+    try {
+      const res = await fetch("http://localhost:5000/api/ideas", {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const data = await res.json();
+      ideas = data;
+      renderIdeas();
+    } catch (err) {
+      console.error("Error loading ideas:", err);
+    }
+  }
+
+  function renderIdeas() {
+    document.getElementById("techIdeas").innerHTML = "";
+    document.getElementById("funIdeas").innerHTML = "";
+    document.getElementById("workshopIdeas").innerHTML = "";
+
+    let techCount = 0, funCount = 0, workshopCount = 0;
+
+    ideas.forEach((i, idx) => {
+      const div = document.createElement("div");
+      div.className = "event event-color-" + i.category;
+
+      let content = `<strong>${i.user?.username || "Anonymous"}</strong>: ${i.text} ${i.time ? `(${i.time})` : ''}`;
+      if (currentRole === "admin") {
+        content += `<br><small>Contact: ${i.user?.email || "N/A"}</small>`;
+      }
+
+      div.innerHTML = `<span>${content}</span>
+                       <span class="like" onclick="likeIdea(${idx})">👍 ${i.likes}</span>`;
+
+      if (i.category === "Tech") { document.getElementById("techIdeas").appendChild(div); techCount++; }
+      else if (i.category === "Fun") { document.getElementById("funIdeas").appendChild(div); funCount++; }
+      else if (i.category === "Workshop") { document.getElementById("workshopIdeas").appendChild(div); workshopCount++; }
+    });
+
+    document.getElementById("techBtn").innerText = `Tech Ideas (${techCount}) ⬇`;
+    document.getElementById("funBtn").innerText = `Fun Ideas (${funCount}) ⬇`;
+    document.getElementById("workshopBtn").innerText = `Workshop Ideas (${workshopCount}) ⬇`;
+  }
+
+  function likeIdea(idx) {
+    ideas[idx].likes++;
+    renderIdeas();
+  }
+
+  function toggleAccordion(id) {
+    const section = document.getElementById(id);
+    section.style.display = (section.style.display === "none" || section.style.display === "") ? "block" : "none";
+  }
+
+  // ==================== CALENDAR ====================
+  let events = {};
+  let currentDate = new Date();
+
+  async function loadEvents() {
+    try {
+      const res = await fetch('http://localhost:5000/api/events', {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      const data = await res.json();
+      events = {};
+      data.forEach(e => {
+        if (!events[e.date]) events[e.date] = [];
+        events[e.date].push({ title: e.title, category: e.category });
+      });
+      loadCalendar();
+    } catch (err) {
+      console.error("Error loading events:", err);
+    }
+  }
+
+  function loadCalendar() {
+    const calendar = document.getElementById("calendar");
+    const monthName = document.getElementById("monthName");
+    calendar.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    monthName.textContent = monthNames[month] + " " + year;
+
+    const daysOfWeek = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    daysOfWeek.forEach(day => {
+      const dayHeader = document.createElement("div");
+      dayHeader.className = "day-header";
+      dayHeader.textContent = day;
+      calendar.appendChild(dayHeader);
+    });
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "day empty";
+      calendar.appendChild(emptyDiv);
+    }
+
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+      dayDiv.innerHTML = `<div class="date-num">${d}</div>`;
+      const dateKey = `${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+      if (events[dateKey]) {
+        dayDiv.classList.add("highlight");
+        const eventContainer = document.createElement("div");
+        eventContainer.className = "day-events";
+        events[dateKey].forEach(e => {
+          const evt = document.createElement("div");
+          evt.className = `event-color-${e.category}`;
+          evt.style.fontSize = "0.7rem";
+          evt.style.marginTop = "2px";
+          evt.style.padding = "2px 4px";
+          evt.style.borderRadius = "5px";
+          evt.innerText = e.title;
+          eventContainer.appendChild(evt);
+        });
+        dayDiv.appendChild(eventContainer);
+      }
+
+      if (dateKey === todayKey) dayDiv.classList.add("today");
+      dayDiv.onclick = () => addOrShowEvent(dateKey);
+      calendar.appendChild(dayDiv);
+    }
+  }
+
+  function goToToday() { currentDate = new Date(); loadCalendar(); }
+  function prevMonth() { currentDate.setMonth(currentDate.getMonth() - 1); loadCalendar(); }
+  function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); loadCalendar(); }
+
+  async function addOrShowEvent(dateKey) {
+  // Fetch current events for the date
+  const eventList = events[dateKey] || [];
+
+  if (currentRole === "admin") {
+    // Admin can add new events
+    const addNew = confirm("Do you want to add a new event on " + dateKey + "?");
+    if (addNew) {
+      const title = prompt("Event title:");
+      const category = prompt("Category (Tech/Fun/Workshop):", "Tech");
+      if (title) {
+        try {
+          const res = await fetch('http://localhost:5000/api/events', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ date: dateKey, title, category })
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            alert("Error adding event: " + data.message);
+          } else {
+            alert("✅ Event added successfully!");
+            await loadEvents(); // reload all events
+          }
+        } catch (err) {
+          console.error(err);
+          alert("Error adding event.");
+        }
+      }
+    }
+  }
+
+  // Show existing events for everyone
+  if (eventList.length > 0) {
+    showEventModal(dateKey, eventList);
+  } else if (currentRole !== "admin") {
+    alert("No events on this date.");
+  }
+}
+
+function showEventModal(dateKey, eventList) {
+  const modal = document.getElementById("eventModal");
+  modal.style.display = "flex";
+  document.getElementById("modalTitle").innerText = "Events on " + dateKey;
+  if (!eventList || eventList.length === 0) {
+    document.getElementById("modalInfo").innerHTML = "<i>No events scheduled.</i>";
+    return;
+  }
+  document.getElementById("modalInfo").innerHTML =
+    eventList.map(e => `<span class="event-color-${e.category}">${e.title} (${e.category})</span>`).join("<br>");
+}
+
+
+  function closeModal() { document.getElementById("eventModal").style.display = "none"; }
+
+  if (currentRole === "admin") document.getElementById("adminUpload").style.display = "block";
+
+  async function uploadCalendar() {
+    const fileInput = document.getElementById("calendarFile");
+    if (!fileInput.files.length) return alert("Please select a PDF first.");
+    const formData = new FormData();
+    formData.append("calendar", fileInput.files[0]);
+
+    const res = await fetch("http://localhost:5000/api/calendar/upload-pdf", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token },
+      body: formData
+    });
+
+    const data = await res.json();
+    if (res.ok) alert("✅ " + data.message);
+    else alert("❌ Error: " + data.message);
+  }
+
+  // ==================== INIT ====================
+  loadIdeas();
+  loadCalendar();
+  renderIdeas();
+  loadEvents();
+</script>
+
+  <script src="js/common.js"></script>
+</body>
+</html>

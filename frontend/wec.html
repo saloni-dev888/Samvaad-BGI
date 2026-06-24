@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="js/common.js"></script>
+  <title>Women Empowerment Cell</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #8576FF 0%, #1C1678 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: linear-gradient(120deg, #6a11cb, #2575fc);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      font-weight: 700;
+      transition: background 0.5s ease;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      flex: 1;
+      text-align: center;
+    }
+
+    .role-info {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* ===== Gradient Buttons ===== */
+    .gradient-btn {
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+      transition: all 0.3s ease;
+    }
+
+    .gradient-btn:hover {
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      transform: scale(1.05);
+    }
+
+    /* ===== Clean Toggle Switch ===== */
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toggle {
+      position: relative;
+      width: 48px;
+      height: 24px;
+      background: #ccc;
+      border-radius: 34px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle::before {
+      content: "";
+      position: absolute;
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    input[type="checkbox"] {
+      display: none;
+    }
+
+    input:checked + .toggle {
+      background: linear-gradient(90deg, #2575fc, #6a11cb);
+    }
+
+    input:checked + .toggle::before {
+      transform: translateX(24px);
+    }
+
+    /* ===== DARK MODE (Option B: Charcoal Gradient Theme) ===== */
+    body.dark {
+      background: linear-gradient(135deg, #1b1b1b 0%, #2f2f2f 100%);
+      color: #e0e0e0;
+    }
+
+    body.dark header {
+      background: linear-gradient(120deg, #222, #444);
+    }
+
+    body.dark .sidebar {
+      background: linear-gradient(160deg, #222, #333);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    body.dark .sidebar ul li {
+      background: rgba(255, 255, 255, 0.05);
+      color: #eee;
+    }
+
+    body.dark .sidebar ul li:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    body.dark .card {
+      background: linear-gradient(145deg, #2a2a2a, #3b3b3b);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      color: #f1f1f1;
+    }
+
+    /* ===== Layout Below Header ===== */
+    .dashboard-container {
+      display: flex;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      color: #fff;
+      padding: 25px;
+      border-right: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.5s ease;
+    }
+
+    .sidebar h3 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 22px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar ul li:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateX(5px);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      color: #fff;
+      transition: color 0.5s ease;
+    }
+
+    .main-content h2 {
+      font-size: 28px;
+      margin: 0 0 10px;
+    }
+
+    .main-content p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    /* Card Styles */
+    .card {
+      margin-top: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 15px;
+      padding: 25px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.6s ease;
+      transition: background 0.5s ease, color 0.5s ease, box-shadow 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input, textarea { background: rgba(255, 255, 255, 0.8); }
+
+    button {
+      background: #B8B5FF;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #9e9bff;
+      transform: scale(1.05);
+    }
+
+    .concern-list ul { list-style: none; padding: 0; }
+
+    .concern-list li {
+      background: rgba(255, 255, 255, 0.2);
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .concern-list li:hover { background: rgba(255, 255, 255, 0.35); }
+
+    #totalConcerns {
+      font-size: 22px;
+      font-weight: bold;
+      color: #ffd369;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <span class="role-info" id="roleInfo"></span>
+  <h1>SAMVAAD Dashboard</h1>
+  <div class="header-actions">
+    <button class="gradient-btn" onclick="goHome()">Home</button>
+    <button class="gradient-btn" onclick="logout()">Logout</button>
+    <div class="toggle-wrapper">
+      <input type="checkbox" id="darkModeToggle" onclick="toggleDark()" />
+<label class="toggle" for="darkModeToggle"></label>
+
+    </div>
+  </div>
+</header>
+
+<div class="dashboard-container">
+  <aside class="sidebar">
+    <h3>WEC Module</h3>
+    <ul>
+      <li onclick="showDashboard()">📊 Dashboard</li>
+      <li onclick="toggleForm()">✍️ Submit Concern</li>
+      <li onclick="showConcerns()">📂 View Concerns</li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <h2>Welcome to WEC</h2>
+    <p>Submit gender-related concerns confidentially. No login required.</p>
+
+    <div id="dashboardSection" class="card">
+      <h3>Dashboard Overview</h3>
+      <p>Total Concerns Submitted: <span id="totalConcerns">0</span></p>
+      <p>You can submit concerns anonymously or view previously submitted concerns.</p>
+    </div>
+
+    <div id="concernForm" class="card" style="display:none;">
+      <h3>Submit Your Concern</h3>
+      <form id="submitConcern">
+        <input type="text" placeholder="Subject" required />
+        <textarea placeholder="Describe your concern" required></textarea>
+        <label style="color:#fff;"><input type="checkbox"> Submit anonymously</label>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div id="concernList" class="card concern-list" style="display:none;">
+      <h3>Submitted Concerns</h3>
+      <ul id="concerns"></ul>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Session & Role Validation
+  const username = sessionStorage.getItem("username") || "Guest";
+  const role = sessionStorage.getItem("role") || "User";
+  const token = sessionStorage.getItem("token");
+
+  if (!token || !role) {
+    const currentPage = window.location.pathname.split("/").pop();
+    sessionStorage.setItem("redirectAfterLogin", currentPage);
+    alert("Please log in first.");
+    window.location.href = "login.html";
+  } else {
+    document.getElementById("roleInfo").innerText = `${username} (${role.toUpperCase()})`;
+  }
+
+  function logout() {
+    sessionStorage.clear();
+    alert("✅ You have been logged out.");
+    window.location.href = "login.html";
+  }
+
+  function goHome() {
+    window.location.href = "index.html";
+  }
+
+  function toggleForm() {
+    document.getElementById('concernForm').style.display = 'block';
+    document.getElementById('concernList').style.display = 'none';
+    document.getElementById('dashboardSection').style.display = 'none';
+  }
+
+  function showConcerns() {
+    document.getElementById('concernForm').style.display = 'none';
+    document.getElementById('concernList').style.display = 'block';
+    document.getElementById('dashboardSection').style.display = 'none';
+  }
+
+  function showDashboard() {
+    document.getElementById('concernForm').style.display = 'none';
+    document.getElementById('concernList').style.display = 'none';
+    document.getElementById('dashboardSection').style.display = 'block';
+  }
+
+  const API_BASE = "http://localhost:5000/api/wec";
+
+  // Fetch concerns from backend
+  async function loadConcerns() {
+    try {
+      const res = await fetch(API_BASE, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const ul = document.getElementById("concerns");
+      ul.innerHTML = "";
+
+      if (data.success && data.data.length > 0) {
+        data.data.forEach(c => {
+          const li = document.createElement("li");
+          li.innerHTML = `
+            <strong>${c.anonymous ? "Anonymous" : c.submittedBy}</strong>: ${c.subject} - ${c.description}
+            <br>
+            Votes: <span id="votes-${c._id}">${c.votes || 0}</span>
+            <button onclick="voteConcern('${c._id}')">👍 Vote</button>
+          `;
+          ul.appendChild(li);
+        });
+        document.getElementById("totalConcerns").textContent = data.data.length;
+      } else {
+        ul.innerHTML = "<li>No concerns submitted yet.</li>";
+        document.getElementById("totalConcerns").textContent = 0;
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load concerns. Please try again.");
+    }
+  }
+
+  // Submit new concern
+  document.getElementById("submitConcern")?.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const subject = this.querySelector("input").value.trim();
+    const description = this.querySelector("textarea").value.trim();
+    const anonymous = this.querySelector("input[type=checkbox]").checked;
+
+    if (!subject || !description) return alert("Please fill out all fields.");
+
+    try {
+      const res = await fetch(API_BASE, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ subject, description, anonymous })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("✅ Concern submitted!");
+        this.reset();
+        loadConcerns(); // Refresh list
+        showDashboard();
+      } else {
+        alert(data.message || "Server error");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server error, please try again.");
+    }
+  });
+
+  // Vote on a concern
+ async function voteConcern(id) {
+  try {
+    const res = await fetch(`${API_BASE}/vote/${id}`, {
+      method: "PATCH", // <-- changed from POST to PATCH
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById(`votes-${id}`).textContent = data.data.votes; // updated votes
+    } else {
+      alert(data.message || "Could not vote. Try again.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error voting on concern.");
+  }
+}
+
+
+  // Load concerns on page load
+  window.addEventListener("DOMContentLoaded", () => {
+    loadConcerns();
+  });
+</script>
+
+</body>
+</html>

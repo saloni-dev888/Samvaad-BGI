@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Samvaad Management Module</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Light Mode Variables */
+    :root {
+      --bg-color: linear-gradient(120deg, #f4f6fb, #e8edf7);
+      --header-bg: linear-gradient(90deg, #4a90e2, #50c9c3);
+      --header-color: #fff;
+      --sidebar-bg: #2c3e50;
+      --sidebar-hover: #1abc9c;
+      --text-color: #333;
+      --card-bg: #fff;
+      --card-shadow: rgba(0,0,0,0.12);
+      --table-bg: #fff;
+      --table-header-bg: #4a90e2;
+      --table-header-color: #fff;
+      --table-hover: #f1f7ff;
+      --list-bg: #fff;
+      --counter-color: #ff9800;
+    }
+    /* Dark Mode Variables */
+    body.dark {
+      --bg-color: #1e1e2f;
+      --header-bg: #111827;
+      --header-color: #f5f5f5;
+      --sidebar-bg: #111827;
+      --sidebar-hover: #3b82f6;
+      --text-color: #f5f5f5;
+      --card-bg: #1f2937;
+      --card-shadow: rgba(0,0,0,0.5);
+      --table-bg: #1f2937;
+      --table-header-bg: #3b82f6;
+      --table-header-color: #f5f5f5;
+      --table-hover: #374151;
+      --list-bg: #1f2937;
+      --counter-color: #f59e0b;
+    }
+
+    /* Base Styles */
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: var(--header-color);
+      padding: 18px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .header-buttons button {
+      background: linear-gradient(90deg, #ffffff, #e3f2fd);
+      color: #4a90e2;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 6px rgba(255,255,255,0.4);
+    }
+
+    .header-buttons button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0));
+      transition: all 0.5s ease;
+    }
+
+    .header-buttons button:hover::before {
+      left: 100%;
+    }
+
+    .header-buttons button:hover {
+      background: linear-gradient(90deg, #50c9c3, #4a90e2);
+      color: white;
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(80,201,195,0.8), 0 0 25px rgba(74,144,226,0.8);
+    }
+
+    .header-buttons button:active {
+      transform: scale(0.97);
+      box-shadow: 0 0 5px rgba(80,201,195,0.8);
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .toggle-switch input { display: none; }
+    .slider {
+      width: 40px;
+      height: 20px;
+      background: #BBDCE5;
+      border-radius: 34px;
+      position: relative;
+      transition: 0.4s;
+    }
+    .slider::before {
+      content: "";
+      position: absolute;
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.4s;
+    }
+    input:checked + .slider {
+      background: #2196f3;
+    }
+    input:checked + .slider::before {
+      transform: translateX(20px);
+    }
+
+    .container { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar-bg);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding-top: 20px;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .sidebar a {
+      color: white;
+      padding: 14px 25px;
+      text-decoration: none;
+      display: block;
+      font-weight: 500;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      margin: 4px 12px;
+      border-radius: 8px;
+    }
+    .sidebar a:hover, .sidebar a.active {
+      background: var(--sidebar-hover);
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    main { flex: 1; padding: 25px; }
+    section { display: none; animation: fadeIn 0.5s ease; }
+    section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 6px 18px var(--card-shadow);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .card:hover { transform: translateY(-8px) scale(1.04); box-shadow: 0 16px 36px var(--card-shadow); }
+    .card h3 { margin-bottom: 12px; color: var(--text-color); font-size: 18px; }
+    .counter { font-size: 28px; font-weight: bold; color: var(--counter-color); }
+
+    .analytics h2 { color: var(--text-color); margin-bottom: 20px; font-size: 22px; }
+    .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+    .chart-container { background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 6px 18px var(--card-shadow); height: 400px; transition: all 0.3s ease; }
+    .chart-container:hover { transform: translateY(-5px); box-shadow: 0 16px 36px var(--card-shadow); }
+    .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      background: var(--table-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      margin-bottom: 30px;
+      transition: all 0.3s ease;
+    }
+    th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: var(--table-header-bg); color: var(--table-header-color); font-weight: 600; }
+    tr:hover td { background: var(--table-hover); }
+
+    ul {
+      background: var(--list-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+    li { padding: 10px 0; border-bottom: 1px solid #e0e0e0; list-style: none; }
+    li:last-child { border-bottom: none; }
+
+    @media (max-width: 768px) {
+      .charts { grid-template-columns: 1fr; }
+      .sidebar { width: 200px; }
+    }
+    #wecTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--table-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  margin-top: 15px;
+}
+
+#wecTable th, #wecTable td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#wecTable th {
+  background: var(--table-header-bg);
+  color: var(--table-header-color);
+}
+
+#wecTable tr:hover td {
+  background: var(--table-hover);
+}
+/* Filter buttons in Events & Activities */
+#managementEvents + .filter,
+.card .filter button {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #2575fc;
+  background: #fff;
+  color: #2575fc;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card .filter button:hover {
+  background: #2575fc;
+  color: #fff;
+}
+
+.card .filter button.active {
+  background: #2575fc;
+  color: #fff;
+}
+
+/* Dark mode support */
+body.dark .card .filter button {
+  background: #444;
+  color: #ccc;
+  border: 1px solid #80b3ff;
+}
+
+body.dark .card .filter button:hover,
+body.dark .card .filter button.active {
+  background: #80b3ff;
+  color: #222;
+}
+/* Card Container */
+.ideas-card {
+  background: #f9f9f9;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  max-width: 700px;
+  margin: 30px auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Card Title */
+.ideas-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Accordion Buttons */
+.accordion-btn {
+  background-color: #ffffff;
+  color: #444;
+  cursor: pointer;
+  padding: 12px 18px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 16px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  transition: background 0.3s, color 0.3s;
+}
+
+.accordion-btn:hover {
+  background-color: #e0f7fa;
+  color: #00796b;
+}
+
+/* Event List Container */
+.event-list {
+  display: none;
+  padding: 10px 15px;
+  border-left: 3px solid #ccc;
+  margin-bottom: 15px;
+  border-radius: 0 8px 8px 0;
+  background-color: #fff;
+}
+
+/* Single Event */
+.event {
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 6px;
+  background-color: #f0f0f0;
+  transition: background 0.3s;
+}
+
+.event:hover {
+  background-color: #dcedc8;
+}
+
+/* Category Colors */
+.event-color-Tech { border-left: 4px solid #2196F3; }
+.event-color-Fun { border-left: 4px solid #FF9800; }
+.event-color-Workshop { border-left: 4px solid #9C27B0; }
+
+/* Small text for admin email */
+.event small {
+  display: block;
+  color: #666;
+  font-size: 12px;
+}
+/* Refresh Button */
+.refresh-btn {
+  padding: 10px 20px;
+  background-color: rgb(22, 126, 170);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.refresh-btn:hover { background-color: rgb(65, 121, 216); }
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <span>Samvaad Management Dashboard</span>
+    <div class="header-buttons">
+      <button id="homeBtn">Home</button>
+      <button id="logoutBtn">Logout</button>
+      <label class="toggle-switch">
+        <input type="checkbox" id="darkModeToggle" onchange="toggleDark()">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="sidebar">
+      <a href="#" data-page="dashboard" class="active">Dashboard</a>
+      <a href="#" data-page="anonymous">Anonymous Messages</a>
+      <a href="#" data-page="messages">All Messages</a>
+      <a href="#" data-page="feedback">Suggestions & Feedback</a>
+      <a href="#" data-page="wec">WEC Module</a>
+      <a href="#" data-page="events">Events & Activities</a>
+    </div>
+
+    <main>
+      <!-- Dashboard -->
+      <section id="dashboard" class="active">
+        <div class="cards">
+          <div class="card"><h3>Total Students</h3><p class="counter" data-target="1250">0</p></div>
+          <div class="card"><h3>Feedback Received</h3><p class="counter" data-target="980">0</p></div>
+          <div class="card"><h3>Suggestions</h3><p class="counter" data-target="320">0</p></div>
+          <div class="card"><h3>Anonymous Messages</h3><p class="counter" data-target="45">0</p></div>
+        </div>
+        <div class="analytics">
+          <h2>Analytics</h2>
+          <div class="charts">
+            <div class="chart-container">
+              <canvas id="feedbackChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <canvas id="eventChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Anonymous Messages -->
+<section id="anonymous">
+  <h2>Anonymous Messages</h2>
+  <button id="refreshAnonymous" style="margin-left:10px;padding:5px 10px;border-radius:5px;cursor:pointer;">🔄 Refresh</button>
+  <table id="anonymousTable">
+    <thead>
+      <tr>
+        <th>Sender</th>
+        <th>Recipient</th>
+        <th>Message</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+      <!-- All Messages -->
+      <section id="messages">
+        <h2>All Messages</h2>
+        <button id="refreshMessages" style="margin-left:10px;padding:5px 10px;border-radius:5px;cursor:pointer;">🔄 Refresh</button>
+        <table id="messageTable">
+          
+            <tr>
+              <th>Sender</th>
+              <th>Recipient</th>
+              <th>Message</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          
+          
+        </table>
+      </section>
+
+      <!-- Suggestions & Feedback (Admin Only) -->
+<section id="feedback">
+  <h2>Suggestions & Feedback</h2>
+  <button id="refreshFeedback" style="margin-left:10px;padding:5px 10px;border-radius:5px;cursor:pointer;">🔄 Refresh</button>
+  <table id="feedbackTable">
+    <thead>
+      <tr>
+        <th>Name / ID</th>
+        <th>Type</th>
+        <th>Category / Tags</th>
+        <th>Content</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+
+ <!-- WEC Module -->
+<section id="wec">
+  <h2>Submitted Concerns</h2>
+  <button id="refreshConcerns" style="margin-left:10px;padding:5px 10px;border-radius:5px;cursor:pointer;">🔄 Refresh</button>
+  <table id="wecTable">
+    <thead>
+      <tr>
+        <th>Submitted By</th>
+        <th>Subject</th>
+        <th>Description</th>
+        <th>Anonymous</th>
+        <th>Votes</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+
+<!-- Ideas History Card -->
+<div class="ideas-card">
+  <h2>📋 Event Ideas History</h2>
+
+  <!-- Refresh Button -->
+  <div style="text-align:center; margin-bottom: 15px;">
+    <button id="refreshBtn" class="refresh-btn">🔄 Refresh Ideas</button>
+  </div>
+
+  <div class="accordion">
+    <button id="techBtn" class="accordion-btn" onclick="toggleAccordion('techIdeas')">Tech Ideas (0) ⬇</button>
+    <div id="techIdeas" class="event-list"></div>
+  </div>
+
+  <div class="accordion">
+    <button id="funBtn" class="accordion-btn" onclick="toggleAccordion('funIdeas')">Fun Ideas (0) ⬇</button>
+    <div id="funIdeas" class="event-list"></div>
+  </div>
+
+  <div class="accordion">
+    <button id="workshopBtn" class="accordion-btn" onclick="toggleAccordion('workshopIdeas')">Workshop Ideas (0) ⬇</button>
+    <div id="workshopIdeas" class="event-list"></div>
+  </div>
+</div>
+
+
+
+  <!-- Scripts -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script>
+    document.getElementById("refreshMessages").addEventListener("click", loadAllMessages);
+document.getElementById("refreshAnonymous").addEventListener("click", loadAnonymousMessages);
+
+
+
+    // ---------------------------
+    // Sidebar navigation
+    // ---------------------------
+    const links = document.querySelectorAll('.sidebar a');
+    const sections = document.querySelectorAll('section');
+    links.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    links.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    const page = link.getAttribute('data-page');
+    sections.forEach(sec => sec.classList.remove('active'));
+    document.getElementById(page).classList.add('active');
+
+    if(page === "anonymous") loadAnonymousMessages();
+    if(page === "messages") loadAllMessages();
+  });
+});
+
+
+    // ---------------------------
+    // Dark mode
+    // ---------------------------
+    function toggleDark() {
+      document.body.classList.toggle("dark");
+    }
+
+    // ---------------------------
+    // Dashboard counters
+    // ---------------------------
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+      counter.innerText = '0';
+      const updateCounter = () => {
+        const target = +counter.getAttribute('data-target');
+        const c = +counter.innerText;
+        const increment = target / 150;
+        if(c < target){
+          counter.innerText = `${Math.ceil(c + increment)}`;
+          requestAnimationFrame(updateCounter);
+        } else {
+          counter.innerText = target;
+        }
+      }
+      updateCounter();
+    });
+
+    // ---------------------------
+    // Charts
+    // ---------------------------
+    const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
+    const feedbackChart = new Chart(feedbackCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Positive','Neutral','Negative'],
+        datasets: [{ data:[600,250,130], backgroundColor:['#4caf50','#ff9800','#f44336'], hoverOffset: 10, borderWidth: 2, borderColor: '#fff' }]
+      },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ padding:20, font:{size:14} } } } }
+    });
+
+    const eventCtx = document.getElementById('eventChart').getContext('2d');
+    const eventChart = new Chart(eventCtx, {
+      type:'bar',
+      data:{ labels:['Workshop','Seminar','Competition','Webinar'], datasets:[{ label:'Events Count', data:[4,3,2,3], backgroundColor:'#2196f3', borderRadius: 6 }] },
+      options:{ responsive:true, maintainAspectRatio:false, animation:{duration:1500,easing:'easeOutBounce'}, scales:{ y:{ beginAtZero:true } } }
+    });
+
+    // ---------------------------
+    // Home / Logout
+    // ---------------------------
+    document.getElementById("homeBtn").addEventListener("click", () => window.location.href = "index.html");
+    document.getElementById("logoutBtn").addEventListener("click", () => { alert("Logged out!"); window.location.href = "login.html"; });
+
+    // ---------------------------
+    // Message Table
+    // ---------------------------
+    const API_BASE = "http://localhost:5000/api/management";
+    const token = sessionStorage.getItem("token");
+    const tableBody = document.querySelector("#messageTable tbody");
+
+    function addMessageRow(msg, highlight = true) {
+      const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${msg.anonymous ? "Anonymous" : msg.senderEmail}</td>
+    <td>${msg.recipientEmail || "—"}</td>
+    <td>${msg.content}</td>
+    <td>${msg.anonymous ? "Anonymous" : "Normal"}</td>
+    <td>${msg.status}</td>
+    <td>${new Date(msg.createdAt).toLocaleString()}</td>
+  `;
+  if(highlight) row.style.backgroundColor = "#d4edda";
+  tableBody.prepend(row);
+}
+
+function addAnonymousMessageRow(msg, highlight = true){
+  const tableBody = document.querySelector("#anonymousTable tbody");
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>Anonymous</td>
+    <td>${msg.recipientEmail || "—"}</td>
+    <td>${msg.content}</td>
+    <td>${msg.status}</td>
+    <td>${new Date(msg.createdAt).toLocaleString()}</td>
+  `;
+  if(highlight) row.style.backgroundColor = "#d4edda";
+  tableBody.prepend(row);
+}
+
+    async function loadAllMessages() {
+      try {
+        const res = await fetch(`${API_BASE}/messages`, { headers: { Authorization:`Bearer ${token}` } });
+        const data = await res.json();
+        tableBody.innerHTML = "";
+        if(data.success && data.data.length>0) data.data.forEach(msg => addMessageRow(msg));
+        else tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No messages available.</td></tr>`;
+      } catch(err){ console.error(err); }
+    }
+
+    async function loadAnonymousMessages() {
+  try {
+    const res = await fetch(`${API_BASE}/anonymous`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const tableBody = document.querySelector("#anonymousTable tbody");
+    tableBody.innerHTML = "";
+
+    if(data.success && data.data.length > 0){
+      data.data.forEach(msg => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>Anonymous</td>
+          <td>${msg.recipientEmail || "—"}</td>
+          <td>${msg.content}</td>
+          <td>${msg.status}</td>
+          <td>${new Date(msg.createdAt).toLocaleString()}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } else {
+      tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No anonymous messages available.</td></tr>`;
+    }
+  } catch(err){
+    console.error("Error loading anonymous messages:", err);
+  }
+}
+
+    function filterAnonymousMessages() {
+      const rows = tableBody.querySelectorAll("tr");
+      let hasAnonymous = false;
+      rows.forEach(row => {
+        const type = row.children[3].textContent;
+        row.style.display = type === "Anonymous" ? "" : "none";
+        if(type === "Anonymous") hasAnonymous = true;
+      });
+      if(!hasAnonymous) tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No anonymous messages available.</td></tr>`;
+    }
+
+    // ---------------------------
+// Feedback & Suggestions (Admin)
+// ---------------------------
+const FEEDBACK_API = "http://localhost:5000/api/management/feedback";
+
+document.getElementById("refreshFeedback").addEventListener("click", loadFeedback);
+
+async function loadFeedback() {
+  try {
+    const res = await fetch(FEEDBACK_API, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await res.json();
+    const tbody = document.querySelector("#feedbackTable tbody");
+    tbody.innerHTML = "";
+
+    if (data.success && data.data.length) {
+      data.data.forEach(f => {
+        const row = document.createElement("tr");
+        const categoryTags = f.type === "Feedback" ? (f.category || "—") : (f.tags ? f.tags.join(", ") : "—");
+        row.innerHTML = `
+          <td>${f.name || "Anonymous"}</td>
+          <td>${f.type}</td>
+          <td>${categoryTags}</td>
+          <td>${f.content}</td>
+          <td>${new Date(f.createdAt).toLocaleString()}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    } else {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No feedback or suggestions available.</td></tr>`;
+    }
+  } catch (err) { console.error(err); }
+}
+
+// Auto-refresh every 10 seconds
+setInterval(loadFeedback, 10000);
+
+// Load feedback on page load
+document.addEventListener("DOMContentLoaded", loadFeedback);
+
+    // ---------------------------
+    // Socket.IO for live updates
+    // ---------------------------
+  
+
+  const socket = io("http://localhost:5000");
+
+// Join admin room after login
+socket.emit("join", { role: sessionStorage.getItem("role") });
+
+// Listen for new feedback/suggestion
+socket.on("newFeedback", f => {
+  const tbody = document.querySelector("#feedbackTable tbody");
+  const row = document.createElement("tr");
+  const categoryTags = f.type === "Feedback" ? (f.category || "—") : (f.tags ? f.tags.join(", ") : "—");
+  row.innerHTML = `
+    <td>${f.name || "Anonymous"}</td>
+    <td>${f.type}</td>
+    <td>${categoryTags}</td>
+    <td>${f.content}</td>
+    <td>${new Date(f.createdAt).toLocaleString()}</td>
+  `;
+  tbody.prepend(row); // Add on top
+});
+
+  // ---------------------------
+  // Load WEC Concerns (Admin Table Style)
+  // ---------------------------
+  const WEC_API = "http://localhost:5000/api/wec"; // API endpoint for concerns
+  const wecTableBody = document.querySelector("#wecTable tbody");
+
+  // Add a concern row
+  function addConcernRow(c) {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${c.anonymous ? "Anonymous" : c.submittedBy || "—"}</td>
+      <td>${c.subject}</td>
+      <td>${c.description}</td>
+      <td>${c.anonymous ? "Yes" : "No"}</td>
+      <td>${c.votes || 0}</td>
+      <td>${new Date(c.createdAt).toLocaleString()}</td>
+    `;
+    wecTableBody.prepend(row);
+  }
+
+  // Fetch and display concerns
+  async function loadWECConcerns() {
+    try {
+      const res = await fetch(WEC_API, { 
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      wecTableBody.innerHTML = "";
+
+      if(data.success && data.data.length > 0) {
+        data.data.forEach(c => addConcernRow(c));
+      } else {
+        wecTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">No concerns submitted yet.</td></tr>`;
+      }
+    } catch(err) {
+      console.error(err);
+      wecTableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Failed to load concerns.</td></tr>`;
+    }
+  }
+
+  // Refresh button
+  document.getElementById("refreshConcerns").addEventListener("click", loadWECConcerns);
+
+  // Load on page load
+  document.addEventListener("DOMContentLoaded", () => {
+    loadWECConcerns();
+  });
+
+  // Socket.io live updates
+socket.on("newConcern", c => addConcernRow(c));
+  socket.on("concernUpdated", c => loadWECConcerns()); // reload
+
+
+// ===== MANAGEMENT EVENTS =====
+let managementEvents = [];
+let currentEventFilter = "All";
+
+if (currentRole === "admin") {
+  document.getElementById("addManagementEventBtn").style.display = "block";
+}
+
+// Load events from backend
+async function loadManagementEvents() {
+  try {
+    const res = await fetch("http://localhost:5000/api/management/events", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      managementEvents = data.data;
+      renderManagementEvents();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// Render event list
+function renderManagementEvents() {
+  const container = document.getElementById("managementEvents");
+  container.innerHTML = "";
+
+  const filteredEvents = currentEventFilter === "All" 
+    ? managementEvents 
+    : managementEvents.filter(e => e.category === currentEventFilter);
+
+  if (!filteredEvents.length) {
+    container.innerHTML = "<i>No events found.</i>";
+    return;
+  }
+
+  filteredEvents.forEach(e => {
+    const div = document.createElement("div");
+    div.className = `event event-color-${e.category}`;
+    div.innerHTML = `
+      <strong>${e.title}</strong> (${e.category})<br>
+      <small>${e.date}</small>
+    `;
+    div.onclick = () => showManagementEventModal(e);
+    container.appendChild(div);
+  });
+}
+
+// Filter events
+function filterManagementEvents(category) {
+  currentEventFilter = category;
+  document.querySelectorAll(".filter button").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  renderManagementEvents();
+}
+
+// Show event modal
+function showManagementEventModal(eventData) {
+  const modal = document.getElementById("eventModal");
+  modal.style.display = "flex";
+  document.getElementById("modalTitle").innerText = eventData.title;
+  document.getElementById("modalInfo").innerHTML = `
+    <strong>Category:</strong> ${eventData.category}<br>
+    <strong>Date:</strong> ${eventData.date}<br>
+    <strong>Description:</strong> ${eventData.description || "No description"}
+  `;
+}
+
+// Admin adds event
+async function addManagementEvent() {
+  const title = prompt("Event Title:");
+  const category = prompt("Category (Tech/Fun/Workshop):", "Tech");
+  const date = prompt("Date (YYYY-MM-DD):");
+  const description = prompt("Optional description:");
+  if (!title || !category || !date) return alert("Title, category, and date are required!");
+
+  try {
+    const res = await fetch("http://localhost:5000/api/management/events", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ title, category, date, description })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert("✅ Event added!");
+      loadManagementEvents();
+    } else alert("❌ " + data.message);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ===== IDEAS IN MANAGEMENT =====
+let managementIdeas = [];
+async function loadManagementIdeas() {
+  try {
+    const res = await fetch("http://localhost:5000/api/ideas", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    if (res.ok) {
+      managementIdeas = data;
+      renderManagementIdeas();
+    }
+  } catch (err) { console.error(err); }
+}
+
+function renderManagementIdeas() {
+  const techContainer = document.getElementById("techIdeasManagement");
+  const funContainer = document.getElementById("funIdeasManagement");
+  const workshopContainer = document.getElementById("workshopIdeasManagement");
+
+  techContainer.innerHTML = "";
+  funContainer.innerHTML = "";
+  workshopContainer.innerHTML = "";
+
+  let techCount = 0, funCount = 0, workshopCount = 0;
+
+  managementIdeas.forEach(i => {
+    const div = document.createElement("div");
+    div.className = `event event-color-${i.category}`;
+    let content = `<strong>${i.user?.username || "Anonymous"}</strong>: ${i.text} ${i.time ? `(${i.time})` : ""}`;
+    if (currentRole === "admin") content += `<br><small>Email: ${i.user?.email || "N/A"}</small>`;
+    div.innerHTML = content;
+
+    if (i.category === "Tech") { techContainer.appendChild(div); techCount++; }
+    else if (i.category === "Fun") { funContainer.appendChild(div); funCount++; }
+    else if (i.category === "Workshop") { workshopContainer.appendChild(div); workshopCount++; }
+  });
+
+  document.getElementById("techIdeasBtn").innerText = `Tech Ideas (${techCount}) ⬇`;
+  document.getElementById("funIdeasBtn").innerText = `Fun Ideas (${funCount}) ⬇`;
+  document.getElementById("workshopIdeasBtn").innerText = `Workshop Ideas (${workshopCount}) ⬇`;
+}
+
+// ===== INIT =====
+loadManagementEvents();
+loadManagementIdeas();
+
+// Filter button
+function filterManagementEvents(category) {
+  currentEventFilter = category;
+  document.querySelectorAll(".filter button").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  renderManagementEvents();
+}
+
+// Show event modal (like calendar)
+function showManagementEventModal(eventData) {
+  const modal = document.getElementById("eventModal");
+  modal.style.display = "flex";
+  document.getElementById("modalTitle").innerText = eventData.title;
+  document.getElementById("modalInfo").innerHTML = `
+    <strong>Category:</strong> ${eventData.category}<br>
+    <strong>Date:</strong> ${eventData.date}<br>
+    <strong>Description:</strong> ${eventData.description || "No description"}
+  `;
+}
+
+// Admin can add event
+async function addManagementEvent() {
+  if (currentRole !== "admin") return;
+
+  const title = prompt("Event Title:");
+  const category = prompt("Category (Tech/Fun/Workshop):", "Tech");
+  const date = prompt("Date (YYYY-MM-DD):");
+  const description = prompt("Optional description:");
+
+  if (!title || !category || !date) return alert("Title, category, and date are required!");
+
+  try {
+    const res = await fetch("http://localhost:5000/api/management/events", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ title, category, date, description })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert("✅ Event added successfully!");
+      loadManagementEvents();
+    } else {
+      alert("❌ Error: " + data.message);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error adding event.");
+  }
+}
+async function addCalendarEvent() {
+  if (currentRole !== "admin") return alert("Only admins can add events");
+
+  const title = prompt("Event Title:");
+  const category = prompt("Category (Tech/Fun/Workshop):");
+  const date = prompt("Event Date (YYYY-MM-DD):");
+  const description = prompt("Optional description:");
+
+  if (!title || !category || !date) return alert("Title, category, and date are required!");
+
+  try {
+    const res = await fetch("http://localhost:5000/api/events", {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "Authorization":"Bearer "+token },
+      body: JSON.stringify({ title, category, date, description })
+    });
+    const data = await res.json();
+    if(res.ok && data.success){
+      alert("Event added successfully!");
+      loadEvents(); // reload calendar
+    } else alert("Error: " + data.message);
+  } catch(err){
+    console.error(err); alert("Failed to add event");
+  }
+}
+
+
+// Init
+loadManagementEvents();
+
+
+const currentRole = sessionStorage.getItem("role") || "user";
+
+let ideas = [];
+
+// Fetch ideas history from server
+async function loadIdeasHistory() {
+  try {
+    const res = await fetch("http://localhost:5000/api/ideas", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    ideas = data || [];
+    renderIdeasHistory();
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+// Render ideas in accordion
+function renderIdeasHistory() {
+  const categories = ["Tech", "Fun", "Workshop"];
+  categories.forEach(cat => document.getElementById(cat.toLowerCase() + "Ideas").innerHTML = "");
+  let counts = { Tech:0, Fun:0, Workshop:0 };
+
+  ideas.forEach(i => {
+    const div = document.createElement("div");
+    div.className = "event event-color-" + i.category;
+    div.innerHTML = `<strong>${i.user?.username || "Anonymous"}</strong>: ${i.text} ${i.time ? `(${i.time})` : ''}`;
+    
+    if (currentRole === "admin") {
+      div.innerHTML += `<br><small>Email: ${i.user?.email || "N/A"}</small>`;
+    }
+
+    document.getElementById(i.category.toLowerCase() + "Ideas").appendChild(div);
+    counts[i.category]++;
+  });
+
+  document.getElementById("techBtn").innerText = `Tech Ideas (${counts.Tech}) ⬇`;
+  document.getElementById("funBtn").innerText = `Fun Ideas (${counts.Fun}) ⬇`;
+  document.getElementById("workshopBtn").innerText = `Workshop Ideas (${counts.Workshop}) ⬇`;
+}
+
+// Toggle accordion visibility
+function toggleAccordion(id) {
+  const section = document.getElementById(id);
+  section.style.display = (section.style.display === "none" || section.style.display === "") ? "block" : "none";
+}
+
+// Manual refresh
+document.getElementById("refreshBtn").addEventListener("click", loadIdeasHistory);
+
+// Auto-refresh every 10 seconds
+setInterval(loadIdeasHistory, 10000);
+
+// Initial load
+document.addEventListener("DOMContentLoaded", loadIdeasHistory);
+</script>
+ <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+</body>
+</html>

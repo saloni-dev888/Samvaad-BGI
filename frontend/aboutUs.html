@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us - College App</title>
+  <style>
+/* Reset & basic styling */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #77BEF0;
+  color: #333;
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background-color: #FEF3E2;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  animation: fadeIn 1s ease-in;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Headings */
+h1, h2 {
+  text-align: center;
+  color: #2c3e50;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+h1 {
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+}
+
+h2 {
+  margin-top: 40px;
+  font-size: 2rem;
+  color: #34495e;
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  margin: 20px auto 0 auto;
+  border-radius: 2px;
+}
+
+h4 {
+  text-align: center;
+  color: #555;
+  font-weight: 500;
+  margin-bottom: 20px;
+  font-style: bold;
+}
+
+/* Paragraph */
+p {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 20px;
+  color: #555;
+  text-align: justify;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+/* Team Members */
+.team-members {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.member {
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  padding: 20px;
+  border-radius: 15px;
+  width: 220px;
+  margin: 15px;
+  text-align: center;
+  transition: transform 0.4s, box-shadow 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.member:hover {
+  transform: translateY(-10px) scale(1.05);
+  box-shadow: 0 15px 25px rgba(0,0,0,0.25);
+}
+
+.member img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+  object-fit: cover;
+  border: 4px solid #2575fc;
+  transition: transform 0.4s;
+}
+
+.member:hover img {
+  transform: scale(1.1);
+}
+
+.member h3 {
+  font-size: 1.2rem;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.member p {
+  color: #555;
+  font-size: 0.95rem;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+/* Social Icons */
+.social-icons {
+  margin-top: 10px;
+}
+
+.social-icons a {
+  margin: 0 5px;
+  display: inline-block;
+  transition: transform 0.3s;
+}
+
+.social-icons a:hover {
+  transform: scale(1.2);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 14px;
+  color: #000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .team-members {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+</style>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/common.js" defer></script>
+
+</head>
+<body>
+  <div id="header"></div>
+<script>
+  fetch("header.html")
+    .then(res => res.text())
+    .then(data => {
+      document.getElementById("header").innerHTML = data;
+    });
+</script>
+
+  <div class="container">
+    <h1>About Us</h1>
+
+    <h2>Our App</h2>
+    <h4>SAMVAAD@BGI</h4>
+    <p>Our College Anonymous Messaging App is more than just a communication tool—it's a safe space where students and faculty can share thoughts, ideas, and feedback without hesitation. Whether it’s a suggestion for improving campus life, a question about a class, or simply a kind word to brighten someone’s day, our app makes sure every voice is heard, valued, and respected.
+
+      With features like anonymous messaging, organized feedback management, and real-time updates, we aim to enhance collaboration, understanding, and well-being across campus—all in a sleek, easy-to-use desktop interface.</p>
+    <h2>About Our College</h2>
+    <p>Buddha Institute of Technology (BIT), approved by A.I.C.T.E. and affiliated with AKTU, is a premier institution recognized nationally and internationally. BIT combines academic excellence with strong industry connections across sectors like Automobile, Aerospace, Defense, Textile, Software, and Manufacturing, providing students with real-world exposure.
+
+Life at BIT blends a vibrant campus culture with rigorous academics, fostering a collaborative, inclusive, and innovative learning environment that promotes both personal growth and student well-being.</p>
+
+    <h2>Our Team</h2>
+    <div class="team-members">
+      <div class="member">
+        <img src="team1.jpg" alt="Team Member 1">
+        <h3>Shambhavi Shukla</h3>
+        <p>Project Lead</p>
+      </div>
+      <div class="member">
+        <img src="team2.jpg" alt="Team Member 2">
+        <h3>Saloni Chauhan</h3>
+        <p>Developer</p>
+      </div>
+      <div class="member">
+        <img src="team3.jpg" alt="Team Member 3">
+        <h3>Aditi Yadav</h3>
+        <p>Designer</p>
+      </div>
+      <!-- Add more members as needed -->
+    </div>
+
+    <footer>
+      &copy; 2025 Buddha Group of Institution | All Rights Reserved
+    </footer>
+  </div>
+  <script src="js/app.js"></script>
+<script>
+  //checking login
+  const token = sessionStorage.getItem("token");
+const currentRole = sessionStorage.getItem("role");
+
+
+
+// 🚀 Logout function
+  function logout() {
+    console.log("Logout clicked"); // debug
+    sessionStorage.clear();
+    alert("You have been logged out.");
+    window.location.href = "login.html";
+  }
+
+  // Call correct handler, e.g.:
+  document.getElementById("messageForm").addEventListener("submit", handleMessageForm);
+</script>
+  <script src="js/common.js"></script>
+</body>
+</html>

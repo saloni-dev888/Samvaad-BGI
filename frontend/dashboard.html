@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SAMVAAD@BGI - Dashboard</title>
+  
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 0;
+      color: #333;
+      position: relative;
+      min-height: 100vh;
+      min-width: 100px;
+      width: auto;
+      height: 100%;
+    }
+
+    /* Background */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("https://tse3.mm.bing.net/th/id/OIP._mx1eeCS_rQGND38sUFduAHaDR?pid=Api&P=0&h=180") no-repeat center center fixed;
+      background-size: cover;
+      filter: blur(6px) brightness(1.6);
+      z-index: -2; 
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 240, 250, 0.3); 
+      z-index: -1; 
+    }
+
+    /* Dark mode tweaks */
+    body.dark { background: #1e1e2f; color: #ddd; }
+    body.dark nav { background: linear-gradient(120deg, #222, #444); }
+    body.dark .card { background: #2b2b44 !important; color: #ddd; }
+    body.dark footer { background: #222; color: #bbb; }
+
+    /* Dashboard Navbar */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 1px;
+      background: rgba(254, 252, 251, 0.7);
+      backdrop-filter: blur(5px);
+      position: sticky;
+      top: 0;
+      width: 99.9%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    nav h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+
+    /* Gradient Buttons (Replaces old buttons) */
+    .nav-actions button {
+      padding: 10px 22px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+      background: linear-gradient(135deg, #ff4e50, #1e90ff);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: all 0.4s ease;
+    }
+    .nav-actions button:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 18px rgba(255, 78, 80, 0.5);
+    }
+
+    /* Dark mode toggle switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background: linear-gradient(90deg, #ff4e50, #1e90ff);
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+      box-shadow: 0 2px 6px rgba(255, 78, 80, 0.6);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 120px 20px 60px;
+    }
+    .hero h2 {
+      font-size: 42px;
+      font-weight: bold;
+      color: #6a1b9a;
+    }
+    .hero h3 {
+      font-size: 24px;
+      color: #6a1b9a;
+    }
+    .hero p {
+      font-size: 18px;
+      font-weight: bold;
+      color: #6e0de4;
+    }
+    .btn { 
+      padding: 10px 20px; 
+      border-radius: 50px; 
+      border: none; 
+      cursor: pointer; 
+      font-weight: bold; 
+      margin: 4px; 
+      transition: all 0.3s ease; 
+      font-family: 'Times New Roman', Times, serif; 
+    } 
+    .btn-1 { 
+      background: rgba(255,255,255,0.75); 
+      color: #333; 
+    }
+    .btn-1:hover { background: #93c8fd; transform: scale(1.05); }
+    
+    /* Features */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+    .card {
+      background: rgba(255,255,255,0.75);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      text-align: center;
+    }
+    .card:hover { transform: scale(1.05); }
+    .card h3 { color: #6a1b9a; margin-bottom: 10px; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      background: rgba(255,255,255,0.7);
+      padding: 20px;
+      backdrop-filter: blur(5px);
+      border-top: 2px solid #e2d4f7;
+      margin-top: 20px;
+    }
+    footer p { margin: 5px 0; color: #666; }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <h1>SAMVAAD@BGI - Dashboard</h1>
+    <div class="nav-actions">
+      <button onclick="goToProfile()">👤 Profile</button>
+      <button onclick="goToSettings()">⚙ Settings</button>
+      <button onclick="logout()">Logout</button>
+      <!-- Dark mode slider -->
+      <label class="switch">
+  <input type="checkbox" id="darkModeSwitch" onclick="toggleDark()">
+  <span class="slider"></span>
+</label>
+
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Welcome, <span id="username">User</span> 🎉</h2>
+    <h3>Whispers of Change, Echoes of Care</h3>
+    <p>Because every silent voice deserves to be heard 💌</p>
+    <button class="btn btn-1"><a href="about_college.html" style="text-decoration:none;color:inherit;">Know More About College</a></button>
+    <button class="btn btn-1"><a href="profile.html" style="text-decoration:none;color:inherit;">Your Profile</a></button>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="card" style="border:2px solid #f8b4d9;">
+      <a href="messages.html" style="text-decoration:none; color:inherit;">
+        <h3>📨 Messages</h3>
+      </a>
+      <p>Send and receive both normal and anonymous messages securely.</p>
+    </div>
+
+    <div class="card admin-only" style="border:2px solid #b2f2bb;">
+      <a href="management.html" style="text-decoration:none; color:inherit;">
+        <h3>📊 Management</h3>
+      </a>
+      <p>View dashboards, stats & take action on insights.</p>
+    </div>
+
+    <div class="card" style="border:2px solid #cdb4f5;">
+      <a href="wec.html" style="text-decoration:none; color:inherit;">
+        <h3>💜 Women Empowerment Cell (WEC)</h3>
+      </a>
+      <p>Receive confidential gender-related concerns & urgent alerts.</p>
+    </div>
+
+    <div class="card admin-only" style="border:2px solid #a5d8ff;">
+      <a href="admin.html" style="text-decoration:none; color:inherit;">
+        <h3>🛠 Admin</h3>
+      </a>
+      <p>Manage users, roles & ensure system security — without accessing private messages.</p>
+    </div>
+
+    <div class="card" style="border:2px solid #f8b4d9;">
+      <a href="event.html" style="text-decoration:none; color:inherit;">
+        <h3>🎉 Events & Activities</h3>
+      </a>
+      <p>Get updates on campus events and activities.</p>
+    </div>
+
+    <div class="card" style="border:2px solid #b2f2bb;">
+      <a href="feedback.html" style="text-decoration:none; color:inherit;">
+        <h3>💬 Feedback & Suggestions</h3>
+      </a>
+      <p>Send feedback, share ideas, and propose new activities.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 SAMVAAD@BGI | Communication Beyond Boundaries</p>
+  </footer>
+
+  <script>
+    const token = sessionStorage.getItem("token");
+    const currentUser = sessionStorage.getItem("username");
+    const userRole = sessionStorage.getItem("role");
+
+    if (!token) {
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("username").innerText = currentUser || "User";
+    }
+
+    if (userRole !== "admin") {
+      document.querySelectorAll(".admin-only").forEach(el => el.style.display = "none");
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      alert("Logged out successfully!");
+      window.location.href = "index.html";
+    }
+    function goToProfile() { window.location.href = "profile.html"; }
+    function goToSettings() { alert("Settings coming soon..."); }
+
+    
+  </script>
+  <script src="js/common.js"></script>
+</body>
+</html>

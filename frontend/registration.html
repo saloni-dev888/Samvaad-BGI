@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - SAMVAAD</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/common.js"></script>
+  <style>
+    /* ====== HEADER ====== */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+      padding: 18px 30px;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+      z-index: 1000;
+      box-sizing: border-box;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .app-title {
+      font-size: 1.4rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* ====== TOGGLE SWITCH ====== */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+      margin-left: 10px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background: linear-gradient(90deg, #6a11cb, #2575fc);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    body.dark header,
+    body.dark .main-header {
+      background: linear-gradient(90deg, #1a1a1a, #333);
+    }
+
+    /* ====== BODY ====== */
+    body {
+      margin: 0;
+      padding-top: 90px;
+      background-color: #B7E0FF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: "Poppins", sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body.dark {
+      background: linear-gradient(135deg, #222, #444);
+      color: #e6e6e6;
+    }
+
+    /* ====== CONTAINER ====== */
+    .container {
+      background: #FCECDD;
+      padding: 2rem;
+      width: 420px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    body.dark .container {
+      background: rgba(45, 45, 45, 0.95);
+      color: #eee;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    h2 {
+      color: #1e3a8a;
+      margin-bottom: 1rem;
+    }
+
+    body.dark h2 {
+      color: #80b3ff;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    body.dark label {
+      color: #ddd;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    body.dark input,
+    body.dark select {
+      background: #3a3a3a;
+      color: #fff;
+      border: 1px solid #666;
+    }
+
+    body.dark input:focus,
+    body.dark select:focus {
+      border-color: #80b3ff;
+      box-shadow: 0 0 6px rgba(128, 179, 255, 0.5);
+    }
+
+    .btn {
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+    }
+
+    body.dark .btn {
+      background: linear-gradient(90deg, #3f3f3f, #555);
+      color: #fff;
+    }
+
+    body.dark .btn:hover {
+      background: linear-gradient(90deg, #555, #666);
+      box-shadow: 0 6px 15px rgba(255, 255, 255, 0.1);
+    }
+
+    .footer {
+      margin-top: 1rem;
+      font-size: 14px;
+      color: #444;
+    }
+
+    body.dark .footer {
+      color: #ccc;
+    }
+
+    .footer a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    body.dark .footer a {
+      color: #80b3ff;
+    }
+
+    body.dark .footer a:hover {
+      color: #a8c7ff;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+
+    /* ====== DARK MODE TOGGLE SWITCH ====== */
+    .theme-toggle {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      z-index: 2000;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 45px;
+      height: 22px;
+      background: #ccc;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    body.dark .toggle-switch {
+      background: #80b3ff;
+    }
+    body.dark .toggle-switch::after {
+      transform: translateX(23px);
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 768px) {
+      .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 18px;
+        font-size: 18px;
+      }
+
+      .app-title {
+        margin-bottom: 8px;
+      }
+
+      .container {
+        width: 90%;
+        padding: 1.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-header {
+        font-size: 16px;
+        padding: 10px;
+      }
+
+      .container {
+        width: 95%;
+        padding: 1rem;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <div id="header"></div>
+
+  <!-- Dark Mode Toggle -->
+  <div class="theme-toggle">
+    <div class="toggle-switch" id="themeToggle" onclick="toggleDark()"></div>
+  </div>
+
+  <script>
+    // Apply saved dark mode on load
+    const toggle = document.getElementById("themeToggle");
+    if (toggle) {
+      if (sessionStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark");
+      }
+    }
+  </script>
+
+  <!-- Registration Form -->
+  <div class="container">
+    <h2>Register</h2>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="username">Full Name</label>
+        <input type="text" id="username" placeholder="Enter your name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">College Email</label>
+        <input type="email" id="email" placeholder="Enter your college email" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter password" required>
+      </div>
+
+      <div class="form-group">
+        <label for="role">Role</label>
+        <select id="role" required>
+          <option value="">-- Select Role --</option>
+          <option value="student">Student</option>
+          <option value="faculty">Faculty</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" required>
+          <option value="">Select Department</option>
+          <option value="CSE">Computer Science & Engineering</option>
+          <option value="IT">Information Technology</option>
+          <option value="ECE">Electronics & Communication</option>
+          <option value="ME">Mechanical Engineering</option>
+          <option value="CE">Civil Engineering</option>
+          <option value="EE">Electrical Engineering</option>
+          <option value="MBA">MBA</option>
+          <option value="Diploma">Diploma</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn">Register</button>
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div class="footer">
+      Already registered? <a href="login.html">Login here</a>
+    </div>
+  </div>
+
+  <!-- Registration JS -->
+  <script>
+    const API_BASE = "http://localhost:5000/api/auth";
+    const msgBox = document.getElementById("message");
+    const registerForm = document.getElementById("registerForm");
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const role = document.getElementById("role").value;
+      const department = document.getElementById("department").value.trim();
+
+      if (!username || !email || !password || !role || !department) {
+        return showMessage("⚠ Please fill all the fields.", "error");
+      }
+
+      const allowedDomain = "@bit.ac.in";
+      if (!email.endsWith(allowedDomain)) {
+        showMessage("Please use your official college email (e.g., name@bit.ac.in)", "error");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password, role, department })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Registration failed.");
+
+        sessionStorage.setItem("registeredEmail", email);
+        showMessage("✅ Registration successful! Redirecting to OTP verification...", "success");
+
+        setTimeout(() => (window.location.href = "verify.html"), 2000);
+      } catch (err) {
+        showMessage(err.message, "error");
+      }
+    });
+
+    function showMessage(text, type) {
+      msgBox.textContent = text;
+      msgBox.className = `message ${type}`;
+    }
+  </script>
+</body>
+</html>

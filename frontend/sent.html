@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📤 Sent Messages - SAMVAAD</title>
+</head>
+<body>
+  <div class="sent-wrapper">
+    <div class="sent-container">
+      <h2>📤 Sent Messages</h2>
+      <p>Messages you’ve sent</p>
+
+      <div id="sentList" class="message-list"></div>
+      <div id="statusMsg" class="footer"></div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const API_BASE = "http://localhost:5000";
+  const token = sessionStorage.getItem("token");
+  const userEmail = sessionStorage.getItem("email");
+  if (!token) return;
+
+  const list = document.getElementById("sentList");
+  const statusMsg = document.getElementById("statusMsg");
+
+  async function loadSent() {
+    try {
+      const res = await fetch(`${API_BASE}/api/messages/sent`, {
+        headers: { "Authorization": `Bearer ${token}` },
+      });
+      const messages = await res.json();
+      list.innerHTML = "";
+      if (!messages.length) {
+        statusMsg.textContent = "No sent messages yet.";
+        return;
+      }
+      messages.forEach(addSentMessage);
+      statusMsg.textContent = "";
+    } catch {
+      statusMsg.textContent = "⚠️ Failed to load sent messages.";
+    }
+  }
+
+  function addSentMessage(msg) {
+    const div = document.createElement("div");
+    div.className = "message-card";
+    div.innerHTML = `
+      <strong>To: ${msg.recipientEmail}</strong><br>
+      <span>${msg.content.length > 100 ? msg.content.slice(0, 100) + "..." : msg.content}</span><br>
+      <small>${new Date(msg.createdAt).toLocaleString()}</small>
+    `;
+
+    // 🖱️ Click to view the message
+    div.addEventListener("click", () => {
+      sessionStorage.setItem("selectedMessage", JSON.stringify(msg));
+      window.parent.loadPage("messageView.html");
+    });
+
+    list.prepend(div);
+  }
+
+  loadSent();
+
+  // ✅ Real-time updates for sender
+  if (typeof socket !== "undefined") {
+    socket.on("messageSent", (msg) => {
+      if (msg.senderEmail === userEmail) addSentMessage(msg);
+    });
+  }
+})();
+</script>
+
+<style>
+  /* Main container matches inbox and messages layout */
+  .sent-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .sent-container {
+    background: #FCECDD;
+    width: 100%;
+    max-width: 700px;
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: left;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    color: #1e3a8a;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  p {
+    color: #555;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .message-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+
+  .message-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+
+  .message-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .message-card strong {
+    color: #1e3a8a;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .message-card span {
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+
+  .message-card small {
+    color: #666;
+    font-size: 12px;
+  }
+
+  .footer {
+    margin-top: 15px;
+    color: #444;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* Responsive view */
+  @media (max-width: 768px) {
+    .sent-container {
+      width: 95%;
+      padding: 1.5rem;
+    }
+  }
+</style>
+</body>
+</html>

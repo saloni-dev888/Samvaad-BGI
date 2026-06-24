@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📨 Message Details - SAMVAAD</title>
+</head>
+<body>
+  <div class="page-container">
+    <div class="container" id="messageContainer">
+      <h2>📨 Message Details</h2>
+      <div id="messageDetails"></div>
+      <div class="actions">
+        <button class="btn" id="replyBtn">↩️ Reply</button>
+        <button class="btn-secondary" id="resendBtn">🔁 Resend</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messageData = sessionStorage.getItem("selectedMessage");
+    const container = document.getElementById("messageDetails");
+
+    if (!messageData) {
+      container.innerHTML = "<p>⚠️ No message selected.</p>";
+    } else {
+      const msg = JSON.parse(messageData);
+      container.innerHTML = `
+        <p><strong>From:</strong> ${msg.anonymous ? "Anonymous" : msg.senderEmail}</p>
+        <p><strong>To:</strong> ${msg.recipientEmail}</p>
+        <p><strong>Sent:</strong> ${new Date(msg.createdAt).toLocaleString()}</p>
+        <hr>
+        <p>${msg.content}</p>
+      `;
+
+      // ✅ Reply button (only if not anonymous)
+      document.getElementById("replyBtn").addEventListener("click", () => {
+        sessionStorage.setItem("replyTo", JSON.stringify({
+          recipientEmail: msg.senderEmail,
+        }));
+        window.parent.loadPage("compose.html");
+      });
+
+      // ✅ Resend (prefill compose with same recipient + content)
+      document.getElementById("resendBtn").addEventListener("click", () => {
+        sessionStorage.setItem("draftToEdit", JSON.stringify({
+          recipientEmail: msg.recipientEmail,
+          content: msg.content,
+        }));
+        window.parent.loadPage("compose.html");
+      });
+    }
+  </script>
+
+  <style>
+    body { font-family:"Segoe UI"; background:#f7fafc; display:flex; justify-content:center; align-items:flex-start; padding-top:40px; }
+    .container { background:#FCECDD; width:600px; padding:2rem; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+    h2 { color:#1e3a8a; text-align:center; margin-bottom:20px; }
+    #messageDetails p { color:#333; line-height:1.6; }
+    hr { border:0; border-top:1px solid #ccc; margin:15px 0; }
+    .actions { display:flex; justify-content:center; gap:10px; margin-top:20px; }
+    .btn, .btn-secondary {
+      padding:10px 20px; border:none; border-radius:10px; font-size:15px;
+      cursor:pointer; transition:0.3s;
+    }
+    .btn { background:#2563eb; color:white; }
+    .btn:hover { background:#1d4ed8; }
+    .btn-secondary { background:#6b7280; color:white; }
+    .btn-secondary:hover { background:#4b5563; }
+  </style>
+</body>
+</html>

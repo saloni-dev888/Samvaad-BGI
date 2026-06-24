@@ -1,0 +1,111 @@
+/* 🌙 DARK MODE GLOBAL STYLES */
+body.dark {
+  background: #1e1e2f;
+  color: #ddd;
+}
+
+/* Header */
+body.dark header {
+  background: linear-gradient(120deg, #222, #444);
+  color: #ddd;
+}
+
+/* Cards / Sections */
+body.dark .card {
+  background: #2b2b44 !important;
+  color: #ddd;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+/* Buttons */
+body.dark button {
+  background: #80b3ff !important;
+  color: #222 !important;
+}
+body.dark button:hover {
+  background: #5590e0 !important;
+}
+
+/* Logout Button */
+.logout-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background: #e60000;
+}
+
+
+body.dark .logout-btn {
+  background: #ff6666;
+  color: #222;
+}
+body.dark .logout-btn:hover {
+  background: #ff3333;
+}
+
+/* Common header style */
+.main-header {
+  display: flex;
+  
+  justify-content:space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  padding: 12px 1px;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 99.999999%;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+/* App title in header */
+header .app-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Dark Mode button (only for login, index, register) */
+header .dark-toggle {
+  cursor: pointer;
+  background: white;
+  color: #2575fc;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+header .dark-toggle:hover {
+  background: #f0f0f0;
+}
+
+body.dark header {
+  background: linear-gradient(120deg, #222, #444);
+}
+body {
+  padding-top: 70px; /* prevent overlap with header */
+}
+body.dark .main-header {
+  background: linear-gradient(90deg, #1e1e2f, #3a3a5c);
+}
+body.dark .logout-btn {
+  background: #ff6666;
+  color: #fff;
+}
+body.dark .logout-btn:hover {
+  background: #cc0000;
+}

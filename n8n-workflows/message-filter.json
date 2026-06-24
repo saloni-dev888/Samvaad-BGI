@@ -1,0 +1,176 @@
+{
+  "name": "Message Moderation Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "message-filter",
+        "method": "POST",
+        "responseMode": "lastNode",
+        "responseData": "allEntries"
+      },
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "https://api.openai.com/v1/moderations",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\"model\":\"omni-moderation-latest\",\"input\":\"{{$json[\\\"content\\\"]}}\"}",
+        "headerParametersJson": "{\"Authorization\":\"Bearer {{$env.OPENAI_API_KEY}}\",\"Content-Type\":\"application/json\"}"
+      },
+      "name": "OpenAI Moderation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json[\"results\"][0][\"flagged\"]}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "name": "Flagged?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [750, 300]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:5000/api/messages/approve",
+        "jsonParameters": true,
+        "bodyParametersJson": "{{$json}}"
+      },
+      "name": "Approve Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1000, 200]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:5000/api/messages/reject",
+        "jsonParameters": true,
+        "bodyParametersJson": "{{$json}}"
+      },
+      "name": "Reject Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1000, 400]
+    },
+    {
+      "parameters": {
+        "requestMethod": "POST",
+        "url": "http://localhost:5000/api/users/block",
+        "jsonParameters": true,
+        "bodyParametersJson": "{{$json}}"
+      },
+      "name": "Block User (Optional)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 2,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "responseMode": "lastNode",
+        "responseCode": 200,
+        "responseData": "={{ {\"approved\": true} }}"
+      },
+      "name": "Respond Approved",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "responseMode": "lastNode",
+        "responseCode": 200,
+        "responseData": "={{ {\"approved\": false, \"reason\": \"Flagged by OpenAI moderation\"} }}"
+      },
+      "name": "Respond Rejected",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1500, 400]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Moderation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Moderation": {
+      "main": [
+        [
+          {
+            "node": "Flagged?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flagged?": {
+      "main": [
+        [
+          {
+            "node": "Approve Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Reject Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approve Message": {
+      "main": [
+        [
+          {
+            "node": "Respond Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reject Message": {
+      "main": [
+        [
+          {
+            "node": "Block User (Optional)",
+            "type": "main",
+            "index": 0
+          },
+          [
+            {
+              "node": "Respond Rejected",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      ]
+    }
+  }
+}

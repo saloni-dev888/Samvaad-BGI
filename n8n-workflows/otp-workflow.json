@@ -1,0 +1,61 @@
+{
+  "name": "Send OTP via Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-otp",
+        "options": {
+          "responseData": "✅ OTP email sent successfully!",
+          "responseCode": 200
+        }
+      },
+      "id": "WebhookNode",
+      "name": "Webhook - Receive OTP",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [300, 300],
+      "webhookId": "send-otp"
+    },
+    {
+      "parameters": {
+        "authentication": "gmailOAuth2",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "Your SAMVAAD Verification OTP",
+        "text": "Hi {{$json[\"username\"]}},\n\nYour SAMVAAD verification code is {{$json[\"otp\"]}}.\nIt will expire in 15 minutes.\n\nIf you didn’t request this, ignore this email.\n\n— SAMVAAD@BGI Team",
+        "options": {
+          "htmlBody": "<div style='font-family:Arial,sans-serif;padding:20px;background:#f4f4f4;'> <h2 style='color:#2563eb;'>SAMVAAD@BGI - Email Verification</h2> <p>Hi <strong>{{$json[\"username\"]}}</strong>,</p> <p>Your verification OTP is:</p> <h1 style='color:#1d4ed8;background:#fff;padding:10px;border-radius:8px;display:inline-block;'>{{$json[\"otp\"]}}</h1> <p>This OTP will expire in 15 minutes.</p> <br> <p>If you did not request this, please ignore.</p> <br> <p>— SAMVAAD@BGI Team</p> </div>"
+        }
+      },
+      "id": "GmailNode",
+      "name": "Send Gmail OTP",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [600, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Receive OTP": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail OTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all"
+  },
+  "active": true
+}

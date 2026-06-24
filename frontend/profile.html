@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Profile & Settings</title>
+<style>
+  /* ---------- Background Enhancement ---------- */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin:0; padding:0;
+    background: linear-gradient(120deg, #6a11cb, #2575fc, #00c6ff, #0072ff);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Floating circles for aesthetic effect */
+  body::before, body::after {
+    content: "";
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    animation: float 12s ease-in-out infinite;
+    z-index: 0;
+  }
+  body::before {
+    top: 10%; left: 10%;
+    animation-delay: 0s;
+  }
+  body::after {
+    bottom: 15%; right: 15%;
+    animation-delay: 6s;
+  }
+
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(25px); }
+  }
+
+  /* ---------- Container & UI ---------- */
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 60px auto;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+
+  .tabs { display: flex; }
+  .tab {
+    flex:1;
+    text-align:center;
+    padding:15px 0;
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+    transition:background 0.3s;
+  }
+  .tab.active {
+    background: rgba(255,255,255,0.2);
+    border-bottom:4px solid #fff;
+  }
+
+  .tab-content { display:none; padding:30px; }
+  .tab-content.active { display:block; }
+
+  .profile-header {
+    text-align:center;
+    color:#fff;
+    padding:30px 20px;
+    position:relative;
+  }
+  .profile-header img {
+    width:130px; height:130px;
+    border-radius:50%;
+    border:5px solid #fff;
+    object-fit:cover;
+    margin-bottom:15px;
+  }
+  .profile-header h2 { margin:5px 0; font-size:1.8em; }
+  .profile-header p { margin:5px 0; font-size:1em; opacity:0.9; }
+
+  .profile-header button {
+    margin-top:10px;
+    background:#fff;
+    font-weight:600;
+    padding:8px 16px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    transition:all 0.3s;
+  }
+
+  .activity-item, .settings-option {
+    display:flex; justify-content:space-between;
+    align-items:center;
+    background:#f7faff;
+    margin-bottom:12px;
+    padding:15px 20px;
+    border-radius:12px;
+    box-shadow:0 3px 6px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .activity-item:hover, .settings-option:hover {
+    transform: translateY(-2px);
+    box-shadow:0 6px 15px rgba(0,0,0,0.1);
+  }
+
+  /* ===== Enhanced Dark Mode ===== */
+  body.dark-mode {
+    background: linear-gradient(135deg, #1a2a6c, #2e1f75, #4b0082, #0f4c81);
+    background-size: 400% 400%;
+    animation: darkGradientFlow 12s ease infinite;
+    color: #e0e0e0;
+  }
+
+  /* Replace all occurrences of body.dark-mode with body.dark */
+body.dark { 
+  background: linear-gradient(135deg, #1a2a6c, #2e1f75, #4b0082, #0f4c81);
+  background-size: 400% 400%;
+  animation: darkGradientFlow 12s ease infinite;
+  color: #e0e0e0;
+}
+body.dark .container { background:#1e1e1e; color:#e0e0e0; }
+body.dark .activity-item, body.dark .settings-option { background:#2c2c2c; color:#e0e0e0; }
+body.dark .profile-header button { background:#444; color:#fff; }
+
+  @keyframes darkGradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  body.dark-mode .container { background:#1e1e1e; }
+  body.dark-mode .activity-item, body.dark-mode .settings-option { background:#2c2c2c; }
+
+  /* --- Toggle Switch --- */
+  .dark-toggle {
+    position:absolute;
+    top:15px;
+    right:15px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+  }
+  .switch {
+    position:relative;
+    display:inline-block;
+    width:48px;
+    height:26px;
+  }
+  .switch input {
+    opacity:0;
+    width:0;
+    height:0;
+  }
+  .slider {
+    position:absolute;
+    cursor:pointer;
+    top:0; left:0; right:0; bottom:0;
+    background-color:#ccc;
+    transition:.4s;
+    border-radius:34px;
+  }
+  .slider:before {
+    position:absolute;
+    content:"";
+    height:20px;
+    width:20px;
+    left:3px;
+    bottom:3px;
+    background-color:white;
+    transition:.4s;
+    border-radius:50%;
+  }
+  input:checked + .slider {
+    background-color:#4a90e2;
+  }
+  input:checked + .slider:before {
+    transform:translateX(22px);
+  }
+
+  /* Go Back Button */
+  .home-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .home-btn:hover {
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    transform: scale(1.05);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="profile-header" id="profileHeader">
+    <!-- Go Back Home Button -->
+    <button class="home-btn" onclick="goHome()">Home</button>
+
+    <!--  Dark Mode Switch -->
+    <label class="dark-toggle">
+      <span>Dark Mode</span>
+      <label class="switch">
+  <input type="checkbox" id="darkModeSwitch" onchange="toggleDark()">
+  <span class="slider"></span>
+</label>
+
+    </label>
+
+    <img id="userImg" src="https://via.placeholder.com/130" alt="Profile">
+    <h2 id="userName"></h2>
+    <p id="userInfo"></p>
+    <button id="editBtn">Edit Profile</button>
+  </div>
+
+  <div class="tabs" id="tabBar">
+    <div class="tab active" onclick="openTab('profile')">Profile</div>
+    <div class="tab" onclick="openTab('activity')">Activity</div>
+    <div class="tab" onclick="openTab('settings')">Settings</div>
+  </div>
+
+  <div id="profile" class="tab-content active">
+    <h3>About Me</h3>
+    <p id="aboutText"></p>
+  </div>
+
+  <div id="activity" class="tab-content">
+    <h3>Your Activity</h3>
+    <div id="activityList"></div>
+  </div>
+
+  <div id="settings" class="tab-content">
+    <h3>Account Settings</h3>
+    <div id="settingsList"></div>
+  </div>
+</div>
+
+<script>
+function openTab(tabName){
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById(tabName).classList.add('active');
+}
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  document.getElementById('darkModeSwitch').checked = isDark;
+  sessionStorage.setItem('darkMode', isDark ? 'true' : 'false');
+}
+
+// On page load, apply saved mode
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+    document.getElementById('darkModeSwitch').checked = true;
+  }
+});
+
+function goHome() {
+  window.location.href = "dashboard.html"; // Redirects to home page
+}
+
+// Example: set this dynamically after login
+const userType = localStorage.getItem('userType') || 'student'; // "student" or "faculty"
+
+const data = {
+  student: {
+    headerColor: "linear-gradient(to right, #6a11cb, #2575fc)",
+    btnColor: "#2575fc",
+    name: "Aditi",
+    info: "B.Tech IT - 3rd Year | Roll No: 2305251540003",
+    about: "Hello! I am Aditi, a 3rd-year IT student passionate about AI, Web Development, and College Events.",
+    activity: [
+      "Feedback submitted for Technical Communication Workshop (2 days ago)",
+      "Anonymous message sent: 'Library timings are too short.' (4 days ago)",
+      "Feedback submitted for Cultural Fest 2025 (1 week ago)"
+    ],
+    settings: [
+      "Change Password", "Update Email", "Anonymous Messaging", "Event Reminders", "Feedback Alerts"
+    ]
+  },
+  faculty: {
+    headerColor: "linear-gradient(to right, #11998e, #38ef7d)",
+    btnColor: "#11998e",
+    name: "Dr. Saurabh Singh",
+    info: "Associate Professor | IT Department",
+    about: "Hello! I am Dr. Saurabh Singh, Assistant Professor in IT. I am passionate about teaching, mentoring students, and organizing academic & tech events.",
+    activity: [
+      "Announcement posted: 'Mid-Sem Exam schedule released' (1 day ago)",
+      "Reviewed feedback for Python Programming Workshop (3 days ago)",
+      "Event created: Hackathon 2025 (1 week ago)"
+    ],
+    settings: [
+      "Change Password", "Update Email", "Allow Anonymous Queries", "Feedback Summary Notifications", "Event Updates Notifications"
+    ]
+  }
+};
+
+const user = data[userType];
+
+document.querySelector('.tabs').style.background = user.headerColor;
+document.getElementById('profileHeader').style.background = user.headerColor;
+document.getElementById('userName').innerText = user.name;
+document.getElementById('userInfo').innerText = user.info;
+document.getElementById('aboutText').innerText = user.about;
+document.querySelector('.profile-header button').style.color = user.btnColor;
+
+document.getElementById('activityList').innerHTML = user.activity.map(a => `
+  <div class="activity-item"><span>${a.split('(')[0]}</span><small>${a.match(/\((.*?)\)/)[1]}</small></div>
+`).join('');
+
+document.getElementById('settingsList').innerHTML = user.settings.map(s => `
+  <div class="settings-option"><span>${s}</span><button style="background:${user.btnColor};color:#fff;">Edit</button></div>
+`).join('');
+</script>
+<script src="js/common.js"></script>
+</body>
+</html>

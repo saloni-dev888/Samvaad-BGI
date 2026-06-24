@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - SAMVAAD</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/common.js"></script>
+  <style>
+    body {
+      background-color: #B7E0FF;
+      font-family: "Poppins", sans-serif;
+      transition: background 0.3s ease, color 0.3s ease;
+      margin: 0;
+      padding: 0;
+    }
+    body.dark {
+      background-color: #1e1e2f;
+      color: #ddd;
+    }
+    .page-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: calc(100vh - 60px);
+      padding: 20px;
+    }
+    .container {
+      background: #FCECDD;
+      padding: 2rem;
+      width: 400px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    body.dark .container {
+      background: #2b2b44;
+      color: #ddd;
+    }
+    h2 { color: #1e3a8a; margin-bottom: 1rem; }
+    body.dark h2 { color: #80b3ff; }
+    .form-group { margin-bottom: 1rem; text-align: left; }
+    label { display: block; font-weight: 500; margin-bottom: 5px; color: #333; }
+    body.dark label { color: #ddd; }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    body.dark input {
+      background: #444;
+      color: #fff;
+      border: 1px solid #666;
+    }
+    .btn {
+      width: 100%;
+      background: #2563eb;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    body.dark .btn {
+      background: #80b3ff;
+      color: #222;
+    }
+    body.dark .btn:hover { background: #5590e0; }
+    .footer { margin-top: 1rem; font-size: 14px; color: #444; }
+    body.dark .footer { color: #bbb; }
+    .footer a { color: #2563eb; text-decoration: none; font-weight: 500; }
+    body.dark .footer a { color: #80b3ff; }
+
+    /* --- Toggle Button --- */
+    .theme-toggle {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 45px;
+      height: 22px;
+      background: #ccc;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .toggle-switch::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .dark .toggle-switch {
+      background: #80b3ff;
+    }
+    .dark .toggle-switch::after {
+      transform: translateX(23px);
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <div class="theme-toggle">
+    
+    <div class="toggle-switch" id="themeToggle" onclick="toggleDark()"></div>
+    
+  </div>
+
+  <div class="page-content">
+    <div class="container">
+      <h2>Login</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">College ID</label>
+          <input type="email" id="email" placeholder="Enter your college email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter password" required>
+        </div>
+        <button type="submit" class="btn">Login</button>
+      </form>
+      <div id="message" class="message"></div>
+      <div class="footer">
+        Not registered? <a href="registration.html">Register here</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    
+
+    // ✅ Login Script
+    const API_BASE = "http://localhost:5000/api/auth";
+    const msgBox = document.getElementById("message");
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!email || !password) return showMessage("Please fill all fields.", "error");
+
+      const allowedDomain = "@bit.ac.in";
+      if (!email.endsWith(allowedDomain)) {
+        showMessage("Please use your official college email (e.g., name@bit.ac.in)", "error");
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await res.json();
+        console.log("Login response:", data);
+
+        if (!res.ok) return showMessage(data.message || "Invalid credentials", "error");
+
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("username", data.username);
+        sessionStorage.setItem("role", data.role);
+        sessionStorage.setItem("email", data.email);
+        sessionStorage.setItem("department", data.department);
+
+        showMessage(`Welcome back, ${data.username}! 🎉`, "success");
+        setTimeout(() => (window.location.href = "dashboard.html"), 1500);
+      } catch (err) {
+        console.error("Login error:", err);
+        showMessage("Something went wrong. Please try again.", "error");
+      }
+    });
+
+    function showMessage(text, type) {
+      msgBox.textContent = text;
+      msgBox.className = `message ${type}`;
+    }
+  </script>
+</body>
+</html>

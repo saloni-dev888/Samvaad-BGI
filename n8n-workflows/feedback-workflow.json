@@ -1,0 +1,92 @@
+{
+  "name": "Anonymous Messages Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "anonymous-message",
+        "options": {}
+      },
+      "id": "1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookDescription": "Triggered when a new anonymous message is posted"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"content\"]}}",
+              "operation": "contains",
+              "value2": "***"
+            }
+          ]
+        }
+      },
+      "id": "2",
+      "name": "Check for Censored Words",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@samvaad.com",
+        "toEmail": "admin@college.com",
+        "subject": "⚠️ Anonymous Message Contains Abusive Content",
+        "text": "A new anonymous message has been flagged:\n\nRecipient: {{$json[\"recipient\"]}}\nContent: {{$json[\"content\"]}}\nCreated At: {{$json[\"createdAt\"]}}"
+      },
+      "id": "3",
+      "name": "Notify Admin",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [750, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@samvaad.com",
+        "toEmail": "archive@college.com",
+        "subject": "Anonymous Message Archived",
+        "text": "A clean anonymous message was posted:\n\nRecipient: {{$json[\"recipient\"]}}\nContent: {{$json[\"content\"]}}\nCreated At: {{$json[\"createdAt\"]}}"
+      },
+      "id": "4",
+      "name": "Archive Message",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [750, 400]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check for Censored Words",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Censored Words": {
+      "main": [
+        [
+          {
+            "node": "Notify Admin",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Archive Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Calendar</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; text-align:center; }
+  iframe { width: 90%; height: 90vh; border: none; border-radius: 10px; }
+</style>
+</head>
+<body>
+  <h1>📄 Academic Calendar</h1>
+  <a href="http://localhost:5000/api/calendar/download-pdf" target="_blank">
+    <button>Download Latest Calendar</button>
+  </a>
+  <iframe src="http://localhost:5000/api/calendar/download-pdf"></iframe>
+</body>
+</html>
